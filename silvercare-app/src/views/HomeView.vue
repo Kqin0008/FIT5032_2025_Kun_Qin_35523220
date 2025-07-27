@@ -1,5 +1,23 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import FeatureCard from '@/components/FeatureCard.vue'
+import HealthNewsModal from '@/components/HealthNewsModal.vue'
+import TaichiBookingModal from '@/components/TaichiBookingModal.vue'
+import PeerRatingModal from '@/components/PeerRatingModal.vue'
+
+function showHealthNews() {
+  const modal = new (window as any).bootstrap.Modal(document.getElementById('healthNewsModal'))
+  modal.show()
+}
+
+function showTaichiBooking() {
+  const modal = new (window as any).bootstrap.Modal(document.getElementById('taichiBookingModal'))
+  modal.show()
+}
+
+function showPeerRating() {
+  const modal = new (window as any).bootstrap.Modal(document.getElementById('peerRatingModal'))
+  modal.show()
+}
 </script>
 
 <template>
@@ -7,187 +25,109 @@ import TheWelcome from '../components/TheWelcome.vue'
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-8 text-center">
-            <h1 class="hero-title">SilverCare</h1>
-            <p class="hero-subtitle">
-              关爱老年人健康，连接社区资源
-            </p>
-            <p class="lead mb-4">
-              专为老年人设计的健康关怀平台，提供健康资讯、活动报名、社区评价等贴心服务
-            </p>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <router-link to="/login" class="btn btn-light btn-lg me-md-2">
-                立即登录
-              </router-link>
-              <router-link to="/register" class="btn btn-outline-light btn-lg">
-                免费注册
-              </router-link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="py-5">
-      <div class="container">
-        <div class="row text-center mb-5">
-          <div class="col-lg-8 mx-auto">
-            <h2 class="display-5 fw-bold mb-3">为什么选择 SilverCare?</h2>
-            <p class="lead text-muted">
-              我们专注于老年人的健康需求，提供简单易用的数字化健康管理服务
-            </p>
-          </div>
-        </div>
-
-        <div class="row g-4">
-          <!-- Health News Feature -->
-          <div class="col-lg-4 col-md-6">
-            <div class="card feature-card h-100">
-              <div class="card-body">
-                <i class="bi bi-heart-pulse feature-icon"></i>
-                <h4 class="card-title">健康资讯</h4>
-                <p class="card-text">
-                  每日更新的健康小贴士，涵盖营养、运动、疾病预防等多个方面，
-                  帮助老年人掌握科学的健康知识。
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Event Registration Feature -->
-          <div class="col-lg-4 col-md-6">
-            <div class="card feature-card h-100">
-              <div class="card-body">
-                <i class="bi bi-calendar-event feature-icon"></i>
-                <h4 class="card-title">活动报名</h4>
-                <p class="card-text">
-                  丰富多彩的社区活动，包括太极拳、健康讲座、营养烹饪课等，
-                  让老年人在活动中收获健康和快乐。
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Peer Rating Feature -->
-          <div class="col-lg-4 col-md-6">
-            <div class="card feature-card h-100">
-              <div class="card-body">
-                <i class="bi bi-star-fill feature-icon"></i>
-                <h4 class="card-title">用户评价</h4>
-                <p class="card-text">
-                  真实的用户反馈和评价系统，帮助我们不断改进服务质量，
-                  为老年用户提供更好的使用体验。
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Statistics Section -->
-    <section class="py-5 bg-light">
-      <div class="container">
-        <div class="row text-center">
-          <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card border-0 bg-transparent">
-              <div class="card-body">
-                <h2 class="display-4 fw-bold text-primary">4.7</h2>
-                <p class="text-muted">用户评分</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card border-0 bg-transparent">
-              <div class="card-body">
-                <h2 class="display-4 fw-bold text-primary">1000+</h2>
-                <p class="text-muted">注册用户</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card border-0 bg-transparent">
-              <div class="card-body">
-                <h2 class="display-4 fw-bold text-primary">50+</h2>
-                <p class="text-muted">健康活动</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card border-0 bg-transparent">
-              <div class="card-body">
-                <h2 class="display-4 fw-bold text-primary">24/7</h2>
-                <p class="text-muted">贴心服务</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="py-5">
-      <div class="container">
-        <div class="row text-center mb-5">
-          <div class="col-lg-8 mx-auto">
-            <h2 class="display-5 fw-bold mb-3">用户心声</h2>
-            <p class="lead text-muted">
-              听听老年用户对 SilverCare 的真实评价
-            </p>
-          </div>
-        </div>
-
-        <div class="row g-4">
-          <div class="col-lg-4">
-            <div class="card rating-card h-100">
-              <div class="card-body text-center">
-                <div class="rating-stars mb-3">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
+        <div class="row align-items-center min-vh-100">
+          <div class="col-lg-6">
+            <div class="hero-content">
+              <h1 class="display-4 fw-bold text-primary mb-4">
+                <i class="bi bi-heart-pulse-fill me-3"></i>
+                SilverCare
+              </h1>
+              <h2 class="h3 text-secondary mb-4">
+                老年人健康关怀平台
+              </h2>
+              <p class="lead text-muted mb-5">
+                专为老年人设计的数字健康平台，提供健康资讯、活动预约和社区互动，
+                让健康生活变得更加简单便捷。
+              </p>
+              
+              <!-- Feature Cards -->
+              <div class="feature-cards-container mb-5">
+                <div class="row g-4">
+                  <div class="col-md-4">
+                    <FeatureCard
+                      title="Health News"
+                      description="每日健康小贴士"
+                      icon-class="bi bi-newspaper text-info"
+                      @click="showHealthNews"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <FeatureCard
+                      title="Event Registration"
+                      description="太极拳班预约"
+                      icon-class="bi bi-calendar-event text-success"
+                      @click="showTaichiBooking"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <FeatureCard
+                      title="Peer Rating"
+                      description="用户评价反馈"
+                      icon-class="bi bi-star-fill text-warning"
+                      :show-rating="true"
+                      :rating="4.7"
+                      subtitle="用户满意度"
+                      @click="showPeerRating"
+                    />
+                  </div>
                 </div>
-                <p class="card-text">
-                  "这个软件非常好用，界面简洁易懂，很适合我们老年人使用！"
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="action-buttons">
+                <div class="d-flex flex-column flex-sm-row gap-3">
+                  <router-link 
+                    to="/login" 
+                    class="btn btn-primary btn-lg px-5 py-3"
+                  >
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    登录
+                  </router-link>
+                  <router-link 
+                    to="/register" 
+                    class="btn btn-outline-primary btn-lg px-5 py-3"
+                  >
+                    <i class="bi bi-person-plus me-2"></i>
+                    注册
+                  </router-link>
+                </div>
+                <p class="text-muted mt-3 mb-0">
+                  <small>
+                    <i class="bi bi-shield-check me-1"></i>
+                    安全可靠，保护您的隐私
+                  </small>
                 </p>
-                <small class="text-muted">- 张大爷，75岁</small>
               </div>
             </div>
           </div>
-          <div class="col-lg-4">
-            <div class="card rating-card h-100">
-              <div class="card-body text-center">
-                <div class="rating-stars mb-3">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star"></i>
+          
+          <!-- Hero Image -->
+          <div class="col-lg-6">
+            <div class="hero-image text-center">
+              <div class="illustration-container">
+                <div class="health-icons">
+                  <div class="icon-item icon-1">
+                    <i class="bi bi-heart-pulse-fill text-danger"></i>
+                  </div>
+                  <div class="icon-item icon-2">
+                    <i class="bi bi-shield-heart text-success"></i>
+                  </div>
+                  <div class="icon-item icon-3">
+                    <i class="bi bi-people-fill text-primary"></i>
+                  </div>
+                  <div class="icon-item icon-4">
+                    <i class="bi bi-activity text-warning"></i>
+                  </div>
+                  <div class="icon-item icon-5">
+                    <i class="bi bi-chat-heart text-info"></i>
+                  </div>
+                  <div class="icon-item icon-6">
+                    <i class="bi bi-calendar-heart text-success"></i>
+                  </div>
                 </div>
-                <p class="card-text">
-                  "功能很丰富，健康资讯很有用，希望能增加更多活动。"
-                </p>
-                <small class="text-muted">- 李护士，专业护理人员</small>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="card rating-card h-100">
-              <div class="card-body text-center">
-                <div class="rating-stars mb-3">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
+                <div class="central-icon">
+                  <i class="bi bi-heart-pulse-fill text-primary"></i>
                 </div>
-                <p class="card-text">
-                  "太极拳课程很棒，老师很耐心，我的身体感觉好多了。"
-                </p>
-                <small class="text-muted">- 王阿姨，68岁</small>
               </div>
             </div>
           </div>
@@ -195,50 +135,224 @@ import TheWelcome from '../components/TheWelcome.vue'
       </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-5 bg-primary text-white">
-      <div class="container text-center">
-        <h2 class="mb-4">准备开始您的健康之旅吗？</h2>
-        <p class="lead mb-4">
-          立即注册 SilverCare，享受专业的老年健康关怀服务
-        </p>
-        <router-link to="/register" class="btn btn-light btn-lg">
-          免费注册
-        </router-link>
-      </div>
-    </section>
+    <!-- Modals -->
+    <HealthNewsModal />
+    <TaichiBookingModal />
+    <PeerRatingModal />
   </div>
 </template>
 
-<script setup lang="ts">
-// No additional script needed for this component
-</script>
-
 <style scoped>
 .hero-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%234ECDC4" stop-opacity="0.1"/><stop offset="100%" stop-color="%234ECDC4" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="300" cy="700" r="120" fill="url(%23a)"/><circle cx="700" cy="800" r="100" fill="url(%23a)"/></svg>');
+  z-index: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.feature-cards-container {
+  margin: 2rem 0;
+}
+
+.action-buttons {
+  margin-top: 2rem;
+}
+
+.btn-primary {
   background: linear-gradient(135deg, #4ECDC4, #45B7AF);
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
-.feature-card {
-  transition: transform 0.3s ease;
+.btn-primary:hover {
+  background: linear-gradient(135deg, #45B7AF, #3ca8a1);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
 }
 
-.feature-card:hover {
-  transform: translateY(-10px);
+.btn-outline-primary {
+  border: 2px solid #4ECDC4;
+  color: #4ECDC4;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
-.rating-card {
-  background: linear-gradient(135deg, #fff, #f8f9fa);
-  border: 1px solid rgba(0,0,0,0.05);
+.btn-outline-primary:hover {
+  background: #4ECDC4;
+  border-color: #4ECDC4;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
 }
 
+/* Hero Image Styles */
+.illustration-container {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  margin: 0 auto;
+}
+
+.central-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  color: #4ECDC4;
+  background: white;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+
+.health-icons {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.icon-item {
+  position: absolute;
+  font-size: 2.5rem;
+  background: white;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  animation: float 3s ease-in-out infinite;
+}
+
+.icon-1 {
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation-delay: 0s;
+}
+
+.icon-2 {
+  top: 30%;
+  right: 10%;
+  animation-delay: 0.5s;
+}
+
+.icon-3 {
+  bottom: 30%;
+  right: 10%;
+  animation-delay: 1s;
+}
+
+.icon-4 {
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation-delay: 1.5s;
+}
+
+.icon-5 {
+  bottom: 30%;
+  left: 10%;
+  animation-delay: 2s;
+}
+
+.icon-6 {
+  top: 30%;
+  left: 10%;
+  animation-delay: 2.5s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 2.5rem;
+  .hero-section {
+    padding: 2rem 0;
+    min-height: auto;
   }
   
-  .hero-subtitle {
-    font-size: 1.1rem;
+  .illustration-container {
+    width: 300px;
+    height: 300px;
+    margin-top: 2rem;
+  }
+  
+  .central-icon {
+    font-size: 3rem;
+    width: 100px;
+    height: 100px;
+  }
+  
+  .icon-item {
+    font-size: 2rem;
+    width: 60px;
+    height: 60px;
+  }
+  
+  .action-buttons .d-flex {
+    flex-direction: column;
+  }
+  
+  .btn-lg {
+    padding: 1rem 2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-content {
+    text-align: center;
+  }
+  
+  .illustration-container {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .central-icon {
+    font-size: 2.5rem;
+    width: 80px;
+    height: 80px;
+  }
+  
+  .icon-item {
+    font-size: 1.5rem;
+    width: 50px;
+    height: 50px;
   }
 }
 </style>
