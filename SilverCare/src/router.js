@@ -7,6 +7,7 @@ import Login from './views/Login.vue';
 import Register from './views/Register.vue';
 import Profile from './views/Profile.vue';
 import Favorites from './views/Favorites.vue';
+import Search from './views/Search.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -17,6 +18,7 @@ const routes = [
   { path: '/register', name: 'Register', component: Register },
   { path: '/profile', name: 'Profile', component: Profile },
   { path: '/favorites', name: 'Favorites', component: Favorites },
+  { path: '/search', name: 'Search', component: Search },
 ];
 
 const router = createRouter({
