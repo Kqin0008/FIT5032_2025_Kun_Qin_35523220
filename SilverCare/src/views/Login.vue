@@ -27,6 +27,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { authState, login } from '../auth.js';
+import bcrypt from 'bcryptjs';
 
 const router = useRouter();
 const email = ref('');
@@ -38,11 +39,12 @@ const loginError = ref('');
 function validateEmail(val) {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val);
 }
+
 function validatePassword(val) {
   return val.length >= 6;
 }
 
-function handleLogin() {
+async function handleLogin() {
   emailError.value = '';
   passwordError.value = '';
   loginError.value = '';
@@ -56,8 +58,14 @@ function handleLogin() {
   }
   // 从localStorage读取用户
   const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const user = users.find(u => u.email === email.value && u.password === password.value);
+  const user = users.find(u => u.email === email.value);
   if (!user) {
+    loginError.value = 'Incorrect email or password.';
+    return;
+  }
+  // 验证密码
+  const isPasswordValid = await bcrypt.compare(password.value, user.password);
+  if (!isPasswordValid) {
     loginError.value = 'Incorrect email or password.';
     return;
   }
@@ -140,4 +148,4 @@ input:focus {
   color: #1ab3a6;
   text-decoration: underline;
 }
-</style> 
+</style>

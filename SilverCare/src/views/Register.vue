@@ -40,6 +40,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { authState, login } from '../auth.js';
+import bcrypt from 'bcryptjs';
 
 const router = useRouter();
 const name = ref('');
@@ -55,9 +56,11 @@ const registerSuccess = ref(false);
 function validateEmail(val) {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val);
 }
+
 function validatePassword(val) {
   return val.length >= 6;
 }
+
 function validateName(val) {
   return val.length >= 2;
 }
@@ -68,7 +71,7 @@ function saveUserToStorage(user) {
   localStorage.setItem('users', JSON.stringify(users));
 }
 
-function handleRegister() {
+async function handleRegister() {
   nameError.value = '';
   emailError.value = '';
   passwordError.value = '';
@@ -91,8 +94,11 @@ function handleRegister() {
     registerError.value = 'Email already registered.';
     return;
   }
+  // 对密码进行哈希处理
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password.value, salt);
   // 保存到localStorage
-  const newUser = { name: name.value, email: email.value, password: password.value, role: role.value };
+  const newUser = { name: name.value, email: email.value, password: hashedPassword, role: role.value };
   saveUserToStorage(newUser);
   registerSuccess.value = true;
   setTimeout(() => {
@@ -137,14 +143,16 @@ label {
   color: #333;
   font-weight: 500;
 }
-input, select {
+input,
+select {
   padding: 10px 12px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   font-size: 1rem;
   outline: none;
 }
-input:focus, select:focus {
+input:focus,
+select:focus {
   border-color: #1ab3a6;
 }
 .auth-btn {
@@ -181,4 +189,4 @@ input:focus, select:focus {
   font-size: 0.98rem;
   margin-top: 8px;
 }
-</style> 
+</style>
