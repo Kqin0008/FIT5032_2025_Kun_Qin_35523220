@@ -126,17 +126,22 @@ function submitRating() {
 .center-layout {
   min-height: 100vh;
   width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background: #f8fafc;
 }
 .rating-page {
-  width: 100%;
   max-width: 900px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+@media (max-width: 900px) {
+  .rating-page { max-width: 100vw; }
+}
+@media (max-width: 600px) {
+  .rating-page { padding: 0 8px; }
 }
 
 .rating-header {

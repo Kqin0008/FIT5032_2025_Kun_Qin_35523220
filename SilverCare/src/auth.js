@@ -13,4 +13,8 @@ export function login(user) {
 export function logout() {
   authState.isAuthenticated = false;
   authState.user = null;
+}
+
+export function hasRole(role) {
+  return authState.user && authState.user.role === role;
 } 

@@ -55,17 +55,22 @@ onMounted(() => {
 .center-layout {
   min-height: 100vh;
   width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background: #f8fafc;
 }
 .news-page {
-  width: 100%;
   max-width: 900px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+@media (max-width: 900px) {
+  .news-page { max-width: 100vw; }
+}
+@media (max-width: 600px) {
+  .news-page { padding: 0 8px; }
 }
 
 .news-header {
