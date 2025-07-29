@@ -56,20 +56,24 @@ async function handleLogin() {
     passwordError.value = 'Password must be at least 6 characters.';
     return;
   }
-  // 从localStorage读取用户
+  
   const users = JSON.parse(localStorage.getItem('users') || '[]');
   const user = users.find(u => u.email === email.value);
   if (!user) {
     loginError.value = 'Incorrect email or password.';
     return;
   }
-  // 验证密码
+  
   const isPasswordValid = await bcrypt.compare(password.value, user.password);
   if (!isPasswordValid) {
     loginError.value = 'Incorrect email or password.';
     return;
   }
   login({ name: user.name, email: user.email, role: user.role });
+
+  if(user.role == 'admin'){
+    alert('Welcome! Administrator!');
+  }
   router.push('/');
 }
 </script>

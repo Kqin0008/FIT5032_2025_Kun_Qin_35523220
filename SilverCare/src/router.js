@@ -8,6 +8,7 @@ import Register from './views/Register.vue';
 import Profile from './views/Profile.vue';
 import Favorites from './views/Favorites.vue';
 import Search from './views/Search.vue';
+import UserManagement from './views/UserManagement.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -19,6 +20,18 @@ const routes = [
   { path: '/profile', name: 'Profile', component: Profile },
   { path: '/favorites', name: 'Favorites', component: Favorites },
   { path: '/search', name: 'Search', component: Search },
+  {
+    path: '/admin/users',
+    name: 'UserManagement',
+    component: UserManagement,
+    // beforeEnter: (to, from, next) => {
+    //   if (authState.user?.role !== 'admin') {
+    //     next({ name: 'Home', query: { error: 'Unauthorized' } });
+    //   } else {
+    //     next();
+    //   }
+    // }
+  }
 ];
 
 const router = createRouter({

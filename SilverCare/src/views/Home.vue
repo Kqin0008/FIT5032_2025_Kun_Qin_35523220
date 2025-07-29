@@ -54,13 +54,23 @@
         <svg width="24" height="24" viewBox="0 0 24 24"><polygon points="12,3 15,10 22,10 17,14 18,21 12,17 6,21 7,14 2,10 9,10" fill="#ffc107"/></svg>
       </button>
     </nav>
+    <div 
+      v-if="isAdminInHomePage" 
+      class="admin-btn-float"
+    >
+      <router-link to="/admin/users">M</router-link>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { authState } from '../auth.js';
+import { useRoute } from 'vue-router';
 const router = useRouter();
+
+const route = useRoute();
 function goTo(page) {
   router.push({ name: page.charAt(0).toUpperCase() + page.slice(1) });
 }
@@ -72,6 +82,12 @@ function handleSearch(e) {
     searchInput.value = '';
   }
 }
+
+const isAdminInHomePage = computed(() => {
+  const isHomeRoute = route.name === 'Home'; 
+  const isAdmin = authState.user?.role === 'admin'; 
+  return isHomeRoute && isAdmin;
+});
 </script>
 
 <style scoped>
@@ -274,5 +290,26 @@ function handleSearch(e) {
   .banner { font-size: 1rem; }
   .card { width: 90vw; min-width: unset; flex: 1 1 90vw; }
   .sidebar { display: none; }
+}
+
+.admin-btn-float {
+  position: fixed;         
+  top: 20px;               
+  right: 20px;            
+  z-index: 999;            
+}
+
+.admin-btn-float a {
+  background: #ff6347;     
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.admin-btn-float a:hover {
+  background: #ff4500;     
 }
 </style>
