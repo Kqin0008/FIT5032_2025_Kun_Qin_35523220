@@ -3,7 +3,9 @@
     <div class="container">
       <header class="header">
         <div class="logo">SilverCare</div>
-        <input class="search-bar" placeholder="Search..." />
+        <form class="search-form" @submit="handleSearch">
+          <input class="search-bar" v-model="searchInput" placeholder="Search..." />
+        </form>
         <div class="user-avatar"></div>
       </header>
       <section class="banner">
@@ -57,9 +59,18 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
+import { ref } from 'vue';
 const router = useRouter();
 function goTo(page) {
   router.push({ name: page.charAt(0).toUpperCase() + page.slice(1) });
+}
+const searchInput = ref('');
+function handleSearch(e) {
+  if (e) e.preventDefault();
+  if (searchInput.value.trim()) {
+    router.push({ name: 'Search', query: { q: searchInput.value.trim() } });
+    searchInput.value = '';
+  }
 }
 </script>
 
@@ -80,8 +91,9 @@ function goTo(page) {
   align-items: center;
   position: relative;
   padding: 0 20px;
-  max-width: 1200px;
-  width: 900px;
+  max-width: 900px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .header {
   width: 100%;
@@ -128,9 +140,11 @@ function goTo(page) {
 }
 .cards {
   display: flex;
+  flex-wrap: wrap;
   gap: 24px;
   margin: 24px 0;
   justify-content: center;
+  width: 100%;
 }
 .card {
   background: #fff;
@@ -138,6 +152,8 @@ function goTo(page) {
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   padding: 32px 24px;
   width: 240px;
+  min-width: 220px;
+  flex: 1 1 240px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -227,15 +243,36 @@ function goTo(page) {
   border-radius: 50%;
   padding: 0;
 }
+.search-form {
+  flex: 1;
+  margin: 0 32px;
+}
+.search-bar {
+  width: 100%;
+}
 @media (max-width: 1200px) {
-  .main-layout { flex-direction: column; align-items: center; }
-  .sidebar { margin-left: 0; margin-top: 24px; }
-  .container { width: 100vw; max-width: 100vw; }
+  .main-layout {
+    flex-direction: row;
+    align-items: center;
+  }
+  .container {
+    max-width: 100vw;
+  }
+  .sidebar {
+    margin-left: 24px;
+  }
+}
+@media (max-width: 900px) {
+  .container { max-width: 100vw; }
+  .cards { gap: 16px; }
+  .banner { font-size: 1.2rem; padding: 16px 8px; }
+  .sidebar { margin-left: 12px; }
 }
 @media (max-width: 600px) {
+  .main-layout { flex-direction: column; align-items: center; }
   .header { flex-direction: column; padding: 16px 8px; }
   .banner { font-size: 1rem; }
-  .card { width: 90vw; }
+  .card { width: 90vw; min-width: unset; flex: 1 1 90vw; }
   .sidebar { display: none; }
 }
 </style>
