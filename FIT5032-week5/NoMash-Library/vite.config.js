@@ -19,7 +19,7 @@ export default defineConfig({
 
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production'
-    ? '/FIT5032week8/'
+    ? '/FIT5032_2025_Kun_Qin_35523220/'
     : '/'
 }
 
