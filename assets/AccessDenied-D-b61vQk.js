@@ -1,0 +1,1 @@
+import{az as n,I as s,j as a,k as o,a1 as e,L as c,a5 as r,J as l,o as _}from"./index-C4hccqmt.js";const i={},d=o("h2",null,"Access Denied",-1);function u(f,m){const t=s("router-link");return _(),a(l,null,[d,o("p",null,[e("You need to "),c(t,{to:"/login"},{default:r(()=>[e("Login")]),_:1}),e(" first.")])],64)}const k=n(i,[["render",u]]);export{k as default};
