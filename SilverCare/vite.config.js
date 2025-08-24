@@ -15,4 +15,22 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  server: {
+    proxy: {
+      // Proxy for local server API
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false
+      }
+    },
+    // Enable HMR explicitly
+    hmr: {
+      enabled: true,
+      // Show overlay on error
+      overlay: true,
+    },
+    // Auto-open browser when server starts
+    open: true
+  }
 })

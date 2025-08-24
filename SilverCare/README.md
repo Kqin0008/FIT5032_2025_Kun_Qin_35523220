@@ -22,6 +22,20 @@ npm install
 npm run dev
 ```
 
+### Start Backend Server for Development
+
+```sh
+npm run dev:server
+```
+
+### Start Both Frontend and Backend Servers
+
+```sh
+npm run dev:both
+```
+
+The backend server provides a proxy interface for sending emails in development environment, which forwards requests to the SendGrid API.
+
 ### Compile and Minify for Production
 
 ```sh

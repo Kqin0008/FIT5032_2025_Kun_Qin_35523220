@@ -27,7 +27,7 @@
         </div>
         <button class="auth-btn" type="submit">Register</button>
         <div v-if="registerError" class="error">{{ registerError }}</div>
-        <div v-if="registerSuccess" class="success">Registration successful!</div>
+        <div v-if="registerSuccess" class="success">register successfully! Redirecting to home page...</div>
       </form>
       <div class="switch-link">
         Already have an account? <router-link to="/login">Login</router-link>
@@ -39,8 +39,10 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { authState, login } from '../auth.js';
-import bcrypt from 'bcryptjs';
+import { register, authState } from '../auth.js';
+import { onMounted, onUnmounted } from 'vue';
+import { initializeAuth, cleanupAuth } from '../auth.js';
+// Firebase services are imported in auth.js and used here
 
 const router = useRouter();
 const name = ref('');
@@ -52,6 +54,25 @@ const emailError = ref('');
 const passwordError = ref('');
 const registerError = ref('');
 const registerSuccess = ref(false);
+const loading = ref(false);
+
+// Initialize auth when component mounts
+onMounted(() => {
+  initializeAuth();
+  // Redirect if already authenticated
+  if (authState.isAuthenticated) {
+    router.push('/');
+  }
+});
+
+// Cleanup auth listener when component unmounts
+onUnmounted(() => {
+  cleanupAuth();
+});
+
+function validateName(val) {
+  return val.length >= 2;
+}
 
 function validateEmail(val) {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val);
@@ -61,50 +82,61 @@ function validatePassword(val) {
   return val.length >= 6;
 }
 
-function validateName(val) {
-  return val.length >= 2;
-}
-
-function saveUserToStorage(user) {
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  users.push(user);
-  localStorage.setItem('users', JSON.stringify(users));
-}
-
 async function handleRegister() {
   nameError.value = '';
   emailError.value = '';
   passwordError.value = '';
   registerError.value = '';
+  registerSuccess.value = '';
+  loading.value = true;
+
+  // Validate inputs
   if (!validateName(name.value)) {
-    nameError.value = 'Name must be at least 2 characters.';
+    nameError.value = 'Name must be at least 2 characters';
+    loading.value = false;
     return;
   }
+
   if (!validateEmail(email.value)) {
-    emailError.value = 'Invalid email format.';
+    emailError.value = 'Please enter a valid email address';
+    loading.value = false;
     return;
   }
+
   if (!validatePassword(password.value)) {
-    passwordError.value = 'Password must be at least 6 characters.';
+    passwordError.value = 'Password must be at least 6 characters';
+    loading.value = false;
     return;
   }
-  // 检查邮箱是否已注册
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  if (users.some(u => u.email === email.value)) {
-    registerError.value = 'Email already registered.';
-    return;
+
+  try {
+    console.log('Starting registration process');
+    await register(email.value, password.value, name.value, role.value);
+    console.log('Registration successful');
+    
+    // 设置成功状态
+    registerSuccess.value = true;
+    console.log('registerSuccess set to true');
+    
+    // 使用nextTick确保DOM更新
+    await nextTick();
+    console.log('DOM updated, success message should be visible');
+    
+    // 2秒后跳转并重置状态
+    setTimeout(() => {
+      console.log('Redirecting to home page');
+      router.push('/');
+      registerSuccess.value = false; // 跳转后隐藏提示
+    }, 2000);
+  } catch (error) {
+    registerError.value = error.message;
+    // 特别处理邮箱已存在的错误
+    if (error.message.includes('auth/email-already-in-use')) {
+      registerError.value = 'This email is already registered. Please log in.';
+    }
+  } finally {
+    loading.value = false;
   }
-  // 对密码进行哈希处理
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password.value, salt);
-  // 保存到localStorage
-  const newUser = { name: name.value, email: email.value, password: hashedPassword, role: role.value };
-  saveUserToStorage(newUser);
-  registerSuccess.value = true;
-  setTimeout(() => {
-    login({ name: name.value, email: email.value, role: role.value });
-    router.push('/');
-  }, 1200);
 }
 </script>
 

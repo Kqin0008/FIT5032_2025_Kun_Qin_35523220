@@ -9,6 +9,9 @@ import Profile from './views/Profile.vue';
 import Favorites from './views/Favorites.vue';
 import Search from './views/Search.vue';
 import UserManagement from './views/UserManagement.vue';
+import TableDemo from './views/TableDemo.vue';
+import EmailSender from './views/EmailSender.vue';
+import MapView from './views/MapView.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -20,17 +23,17 @@ const routes = [
   { path: '/profile', name: 'Profile', component: Profile },
   { path: '/favorites', name: 'Favorites', component: Favorites },
   { path: '/search', name: 'Search', component: Search },
-  {
-    path: '/admin/users',
-    name: 'UserManagement',
-    component: UserManagement,
-    // beforeEnter: (to, from, next) => {
-    //   if (authState.user?.role !== 'admin') {
-    //     next({ name: 'Home', query: { error: 'Unauthorized' } });
-    //   } else {
-    //     next();
-    //   }
-    // }
+  { path: '/tables', name: 'TableDemo', component: TableDemo },
+  { path: '/email', name: 'EmailSender', component: EmailSender },
+  { path: '/map', name: 'MapView', component: MapView },
+  { path: '/admin/users', name: 'UserManagement', component: UserManagement,
+    beforeEnter: (to, from, next) => {
+      if (authState.user?.role !== 'admin') {
+        next({ name: 'Home', query: { error: 'Unauthorized' } });
+      } else {
+        next();
+      }
+    }
   }
 ];
 
@@ -39,4 +42,4 @@ const router = createRouter({
   routes,
 });
 
-export default router; 
+export default router;

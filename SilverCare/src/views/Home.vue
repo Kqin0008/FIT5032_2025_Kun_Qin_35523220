@@ -1,5 +1,8 @@
 <template>
   <div class="main-layout">
+  <div v-if="emailSentSuccess" class="email-success-notification">
+    send email successfully
+  </div>
     <div class="container">
       <header class="header">
         <div class="logo">SilverCare</div>
@@ -7,6 +10,7 @@
           <input class="search-bar" v-model="searchInput" placeholder="Search..." />
         </form>
         <div class="user-avatar"></div>
+        <button class="email-btn" @click="sendTestEmail">E</button>
       </header>
       <section class="banner">
         <h1>Caring for Seniors' Health,<br />Connecting Community Resources</h1>
@@ -60,6 +64,32 @@
     >
       <router-link to="/admin/users">M</router-link>
     </div>
+    <!-- Table button in bottom right corner -->
+    <button class="table-btn" @click="showTables = true">T</button>
+    
+    <!-- Modal for tables -->
+    <div v-if="showTables" class="tables-modal">
+      <div class="tables-modal-content">
+        <span class="close" @click="showTables = false">&times;</span>
+        <h2>Interactive Tables</h2>
+        <div class="table-section">
+          <DataTableComponent
+            title="Users Table"
+            :columns="userColumns"
+            :items="usersData"
+            :rows="10"
+          />
+        </div>
+        <div class="table-section">
+          <DataTableComponent
+            title="Events Table"
+            :columns="eventColumns"
+            :items="eventsData"
+            :rows="10"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -68,6 +98,9 @@ import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
 import { authState } from '../auth.js';
 import { useRoute } from 'vue-router';
+import { sendEmail } from '../services/emailService.js';
+import DataTableComponent from '../components/DataTableComponent.vue';
+
 const router = useRouter();
 
 const route = useRoute();
@@ -75,6 +108,78 @@ function goTo(page) {
   router.push({ name: page.charAt(0).toUpperCase() + page.slice(1) });
 }
 const searchInput = ref('');
+const emailSentSuccess = ref(false);
+
+// Table data
+const showTables = ref(false);
+
+// User table columns
+const userColumns = [
+  { field: 'id', header: 'ID' },
+  { field: 'name', header: 'Name' },
+  { field: 'email', header: 'Email' },
+  { field: 'age', header: 'Age' },
+  { field: 'city', header: 'City' },
+  { field: 'role', header: 'Role' }
+];
+
+// Event table columns
+const eventColumns = [
+  { field: 'id', header: 'ID' },
+  { field: 'title', header: 'Title' },
+  { field: 'date', header: 'Date' },
+  { field: 'location', header: 'Location' },
+  { field: 'category', header: 'Category' },
+  { field: 'attendees', header: 'Attendees' }
+];
+
+// Generate mock user data
+const usersData = ref(Array.from({ length: 50 }, (_, index) => ({
+  id: index + 1,
+  name: `User ${index + 1}`,
+  email: `user${index + 1}@example.com`,
+  age: Math.floor(Math.random() * 50) + 20,
+  city: ['New York', 'London', 'Paris', 'Tokyo', 'Sydney'][Math.floor(Math.random() * 5)],
+  role: ['user', 'admin', 'editor'][Math.floor(Math.random() * 3)]
+})));
+
+// Generate mock event data
+const eventsData = ref(Array.from({ length: 50 }, (_, index) => ({
+  id: index + 1,
+  title: `Event ${index + 1}`,
+  date: new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+  location: ['Community Center', 'Library', 'Park', 'Senior Center', 'Online'][Math.floor(Math.random() * 5)],
+  category: ['Fitness', 'Health', 'Arts', 'Education', 'Social'][Math.floor(Math.random() * 5)],
+  attendees: Math.floor(Math.random() * 100) + 10
+})));
+
+async function sendTestEmail() {
+  try {
+    // 发送测试邮件
+    const result = await sendEmail({
+      to: 'kqin0008@student.monash.edu',
+      subject: 'Test Email from SilverCare',
+      text: 'This is a test email sent from SilverCare application.',
+      attachments: [{
+        filename: 'attachment.txt',
+        content: btoa('Attachment is here!'),
+        type: 'text/plain',
+        disposition: 'attachment'
+      }]
+    });
+    
+    // 显示成功提示
+    emailSentSuccess.value = true;
+    
+    // 3秒后隐藏成功提示
+    setTimeout(() => {
+      emailSentSuccess.value = false;
+    }, 3000);
+  } catch (error) {
+    console.error('Error sending email:', error);
+    alert('Failed to send email. Please try again later.');
+  }
+}
 function handleSearch(e) {
   if (e) e.preventDefault();
   if (searchInput.value.trim()) {
@@ -293,14 +398,14 @@ const isAdminInHomePage = computed(() => {
 }
 
 .admin-btn-float {
-  position: fixed;         
-  top: 20px;               
-  right: 20px;            
-  z-index: 999;            
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
 }
 
 .admin-btn-float a {
-  background: #ff6347;     
+  background: #ff6347;
   color: #fff;
   padding: 8px 12px;
   border-radius: 4px;
@@ -310,6 +415,101 @@ const isAdminInHomePage = computed(() => {
 }
 
 .admin-btn-float a:hover {
-  background: #ff4500;     
+  background: #ff4500;
+}
+
+/* Table button styles */
+.table-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 90px;
+  width: 50px;
+  height: 50px;
+  background: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  transition: background-color 0.2s;
+}
+
+.table-btn:hover {
+  background: #f57c00;
+}
+
+/* Tables modal styles */
+.tables-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tables-modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.table-section {
+  margin-bottom: 2rem;
+}
+.email-btn {
+  width: 40px;
+  height: 40px;
+  background: #1ab3a6; /* 与标题一样的绿色 */
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24px;
+  transition: background-color 0.2s;
+}
+
+.email-btn:hover {
+  background: #149488;
+}
+
+.email-success-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #c8e6c9; /* 草绿色 */
+  color: #333;
+  padding: 20px 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  font-weight: bold;
+  font-size: 1.1rem;
 }
 </style>
