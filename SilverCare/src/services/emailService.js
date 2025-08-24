@@ -36,6 +36,11 @@ if (sgMail.request && sgMail.request.defaults && sgMail.request.defaults.headers
 
 // Production environment configuration
 const isProduction = process.env.NODE_ENV === 'production';
+console.log('Environment check - isProduction:', isProduction);
+console.log('Firebase functions available:', typeof functions !== 'undefined' ? 'YES' : 'NO');
+if (functions) {
+  console.log('Firebase httpsCallable available:', typeof functions.httpsCallable === 'function' ? 'YES' : 'NO');
+}
 
 // Helper function to send email with multiple recipients
 
@@ -59,53 +64,74 @@ export const sendEmail = async ({ to, subject, text, attachments }) => {
 
     // Process attachments if any
     let processedAttachments = [];
-    if (attachments && attachments.length > 0) {
+    if (attachments && Array.isArray(attachments) && attachments.length > 0) {
+      console.log('Processing', attachments.length, 'attachments');
       for (const attachment of attachments) {
+        // Ensure content is pure base64 without any prefix
+        const base64Content = (attachment.base64 || attachment.content || '').split(',').pop();
+        if (!base64Content) {
+          console.error('Attachment has no valid base64 content:', attachment);
+          continue;
+        }
         processedAttachments.push({
-          content: attachment.content,
-          filename: attachment.filename,
-          type: attachment.type,
-          disposition: attachment.disposition
+          content: base64Content,
+          filename: attachment.filename || attachment.fileName || 'attachment',
+          type: attachment.type || attachment.fileType || 'application/octet-stream',
+          disposition: 'attachment'
         });
       }
+    } else if (attachments) {
+      console.error('Attachments is not an array:', attachments);
     }
 
-    // Prepare email data
+    // Prepare email data in SendGrid API format
     const emailData = {
-      to: to,
-      subject: subject,
-      text: text,
+      personalizations: [{
+        to: [{ email: to }],
+        subject: subject
+      }],
+      from: {
+        email: import.meta.env.VITE_SENDER_EMAIL || 'your_verified_sender@example.com'
+      },
+      content: [{
+        type: 'text/plain',
+        value: text
+      }],
       attachments: processedAttachments
     };
 
     if (isProduction) {
       // Production: Call Cloud Function
+      console.log('Attempting to send email via Cloud Function');
+      
       if (!functions) {
+        console.error('Firebase Functions not initialized');
         throw new Error('Firebase Functions not initialized');
       }
       
+      // Ensure httpsCallable is available
+      if (typeof functions.httpsCallable !== 'function') {
+        console.error('Firebase Functions httpsCallable is not available');
+        console.error('Available functions properties:', Object.keys(functions));
+        throw new Error('Firebase Functions httpsCallable is not available');
+      }
+      
       // Get the sendEmail Cloud Function
+      console.log('Getting sendEmail Cloud Function');
       const sendEmailFunction = functions.httpsCallable('sendEmail');
       
       // Call the Cloud Function
+      console.log('Calling Cloud Function with data:', emailData);
       const result = await sendEmailFunction(emailData);
+      console.log('Cloud Function result:', result);
       return result.data;
     } else {
       // Development: Use proxy to send email via local server
-      // Prepare data for local server
-      const sendGridData = {
-        to: emailData.to,
-        subject: emailData.subject,
-        text: emailData.text,
-        attachments: (emailData.attachments || []).map(attachment => ({
-          // Ensure content is pure base64 without any prefix
-          content: (attachment.base64 || attachment.content || '').split(',').pop(),
-          filename: attachment.fileName || attachment.filename || 'attachment',
-          type: attachment.fileType || attachment.type || 'application/octet-stream',
-          disposition: 'attachment'
-        }))
-      };
-  
+      // Send the prepared emailData directly as it's already in SendGrid API format
+      const sendGridData = emailData;
+
+      console.log('Sending email via local server with data:', sendGridData);
+
       // Send email via proxy server
       const response = await fetch('/api/send-email', {
         method: 'POST',
@@ -114,12 +140,15 @@ export const sendEmail = async ({ to, subject, text, attachments }) => {
         },
         body: JSON.stringify(sendGridData)
       });
+
+      console.log('Email service response status:', response.status);
   
       if (!response.ok) {
         // 获取详细的错误信息
         let errorDetails = '';
         try {
           const errorText = await response.text();
+          console.error('Email service error response text:', errorText);
           // 尝试解析JSON，如果失败则使用原始文本
           try {
             const errorData = JSON.parse(errorText);
@@ -130,12 +159,13 @@ export const sendEmail = async ({ to, subject, text, attachments }) => {
         } catch (readError) {
           errorDetails = `Status: ${response.status}, Could not read response body`;
         }
-        
+
         console.error('Email service error response:', {
           status: response.status,
-          statusText: response.statusText
+          statusText: response.statusText,
+          errorDetails
         });
-        
+
         throw new Error(`Failed to send email: ${errorDetails}`);
       }
   

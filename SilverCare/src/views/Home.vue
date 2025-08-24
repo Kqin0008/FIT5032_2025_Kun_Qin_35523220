@@ -10,7 +10,11 @@
           <input class="search-bar" v-model="searchInput" placeholder="Search..." />
         </form>
         <div class="user-avatar"></div>
-        <button class="email-btn" @click="sendTestEmail">E</button>
+        <div class="header-buttons">
+          <button class="email-btn" @click="goTo('emailSender')">E</button>
+          <button class="table-btn" @click="goTo('tableDemo')">T</button>
+          <button class="map-btn" @click="goTo('mapView')">M</button>
+        </div>
       </header>
       <section class="banner">
         <h1>Caring for Seniors' Health,<br />Connecting Community Resources</h1>
@@ -64,8 +68,7 @@
     >
       <router-link to="/admin/users">M</router-link>
     </div>
-    <!-- Table button in bottom right corner -->
-    <button class="table-btn" @click="showTables = true">T</button>
+
     
     <!-- Modal for tables -->
     <div v-if="showTables" class="tables-modal">
@@ -418,27 +421,74 @@ const isAdminInHomePage = computed(() => {
   background: #ff4500;
 }
 
+/* Header buttons container */
+.header-buttons {
+  display: flex;
+  gap: 10px;
+  margin-right: 24px;
+}
+
+/* Email button styles */
+.email-btn {
+  width: 40px;
+  height: 40px;
+  background: #1ab3a6; /* 与标题一样的绿色 */
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.email-btn:hover {
+  background: #149488;
+}
+
 /* Table button styles */
 .table-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 90px;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   background: #ff9800;
   color: white;
   border: none;
   border-radius: 50%;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: background-color 0.2s;
 }
 
 .table-btn:hover {
   background: #f57c00;
+}
+
+/* Map button styles */
+.map-btn {
+  width: 40px;
+  height: 40px;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.map-btn:hover {
+  background: #0b7dda;
 }
 
 /* Tables modal styles */

@@ -32,5 +32,19 @@ export default defineConfig({
     },
     // Auto-open browser when server starts
     open: true
+  },
+  // Ensure Firebase modules are properly bundled
+  build: {
+    rollupOptions: {
+      external: [],
+      output: {
+        manualChunks: (id) => {
+          // Separate Firebase modules into their own chunk
+          if (id.includes('node_modules/firebase')) {
+            return 'firebase';
+          }
+        }
+      }
+    }
   }
 })

@@ -13,6 +13,7 @@ import TableDemo from './views/TableDemo.vue';
 import EmailSender from './views/EmailSender.vue';
 import MapView from './views/MapView.vue';
 
+
 const routes = [
   { path: '/', name: 'Home', component: Home },
   { path: '/news', name: 'News', component: News },
@@ -26,6 +27,7 @@ const routes = [
   { path: '/tables', name: 'TableDemo', component: TableDemo },
   { path: '/email', name: 'EmailSender', component: EmailSender },
   { path: '/map', name: 'MapView', component: MapView },
+
   { path: '/admin/users', name: 'UserManagement', component: UserManagement,
     beforeEnter: (to, from, next) => {
       if (authState.user?.role !== 'admin') {

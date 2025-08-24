@@ -38,9 +38,7 @@
 <script setup>
 import { ref } from 'vue';
 import { sendEmail, uploadAttachment } from '../services/emailService.js';
-import { authState } from '../auth.js';
 import { useRouter } from 'vue-router';
-import { onMounted } from 'vue';
 
 const router = useRouter();
 
@@ -53,13 +51,6 @@ const sending = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
 const errors = ref({});
-
-// Check if user is authenticated
-onMounted(() => {
-  if (!authState.isAuthenticated) {
-    router.push('/login');
-  }
-});
 
 // Handle file selection
 function handleFileChange(event) {
@@ -115,33 +106,23 @@ async function handleSendEmail() {
   sending.value = true;
 
   try {
-    let attachmentUrl = null;
+    // Prepare attachments array
+    let attachments = [];
 
-    // Upload attachment if selected
+    // Process attachment if selected
     if (selectedFile.value) {
       const uploadResult = await uploadAttachment(selectedFile.value);
       if (!uploadResult.success) {
-        throw new Error(uploadResult.message || 'Failed to upload attachment');
+        throw new Error(uploadResult.message || 'Failed to process attachment');
       }
-      attachmentUrl = uploadResult.url;
-    }
-
-    // Send email
-    // Prepare attachments array with Base64 content
-    let attachments = [];
-    if (attachmentUrl) {
-      // Fetch the attachment content from URL and convert to Base64
-      const response = await fetch(attachmentUrl);
-      const blob = await response.blob();
-      const arrayBuffer = await blob.arrayBuffer();
-      const base64 = Buffer.from(arrayBuffer).toString('base64');
 
       attachments.push({
-        content: base64,
-        filename: selectedFile.value.name,
-        type: selectedFile.value.type,
+        base64: uploadResult.base64,
+        filename: uploadResult.fileName,
+        type: uploadResult.fileType,
         disposition: 'attachment'
       });
+      console.log('Prepared attachment:', attachments[0]);
     }
 
     // Send email with object parameters
@@ -198,6 +179,9 @@ textarea {
   width: 100%;
   padding: 8px;
   border: 1px solid #ddd;
+}
+
+.form-control {
   border-radius: 4px;
 }
 

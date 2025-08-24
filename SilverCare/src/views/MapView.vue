@@ -7,24 +7,14 @@
 
 <script setup>
 import MapComponent from '../components/MapComponent.vue';
-import { onMounted } from 'vue';
-import { authState } from '../auth.js';
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
-// Check if user is authenticated
-onMounted(() => {
-  if (!authState.isAuthenticated) {
-    router.push('/login');
-  }
-});
 </script>
 
 <style scoped>
 .map-view {
   padding: 20px;
-  max-width: 1200px;
+  max-width: 1440px;
   margin: 0 auto;
+  width: 100%;
+  display: block;
 }
 </style>

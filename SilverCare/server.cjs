@@ -18,15 +18,7 @@ app.use(express.json());
 // 邮件发送接口
 app.post('/api/send-email', async (req, res) => {
   try {
-    const { to, subject, text, attachments, recipients } = req.body;
-
-    // 验证请求数据
-    if ((!to && !recipients) || !subject || !text) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required email fields'
-      });
-    }
+    const emailData = req.body;
 
     // 检查API密钥是否配置
     if (!process.env.EMAIL_SERVICE_API_KEY) {
@@ -34,45 +26,6 @@ app.post('/api/send-email', async (req, res) => {
         success: false,
         message: 'Email service API key not configured'
       });
-    }
-
-    // 准备SendGrid请求数据
-    let emailData;
-    
-    if (to) {
-      // 单个收件人
-      emailData = {
-        personalizations: [{
-          to: [{ email: to }],
-          subject: subject
-        }],
-        from: {
-          email: process.env.SENDER_EMAIL || 'your_email@example.com',
-          name: 'SilverCare'
-        },
-        content: [{
-          type: 'text/plain',
-          value: text
-        }],
-        attachments: attachments || []
-      };
-    } else {
-      // 多个收件人
-      emailData = {
-        personalizations: recipients.map(email => ({
-          to: [{ email }],
-          subject: subject
-        })),
-        from: {
-          email: process.env.SENDER_EMAIL || 'your_email@example.com',
-          name: 'SilverCare'
-        },
-        content: [{
-          type: 'text/plain',
-          value: text
-        }],
-        attachments: attachments || []
-      };
     }
 
     // 发送请求到SendGrid API
@@ -97,13 +50,21 @@ app.post('/api/send-email', async (req, res) => {
     
     // 提供更详细的错误信息
     let errorMessage = error.message || 'Failed to send email';
+    let errorDetails = {};
+    
     if (error.response) {
       errorMessage = `SendGrid API error: ${error.response.status} - ${error.response.statusText}`;
+      // 尝试获取SendGrid返回的具体错误信息
+      if (error.response.data && error.response.data.errors) {
+        errorDetails = error.response.data.errors;
+        console.error('SendGrid API errors:', errorDetails);
+      }
     }
     
-    res.status(500).json({
+    res.status(error.response?.status || 500).json({
       success: false,
-      message: errorMessage
+      message: errorMessage,
+      details: errorDetails
     });
   }
 });
