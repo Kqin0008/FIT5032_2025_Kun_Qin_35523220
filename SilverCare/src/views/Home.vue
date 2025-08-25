@@ -106,19 +106,24 @@
       <section class="actions">
         <button 
           class="pill" 
-          @click="goTo('login')"
-          @keydown.enter="goTo('login')"
-          @keydown.space.prevent="goTo('login')"
+          @click="handleLoginClick()"
+          @keydown.enter="handleLoginClick()"
+          @keydown.space.prevent="handleLoginClick()"
           aria-label="Log In"
         >Log In</button>
         <button 
           class="pill primary" 
-          @click="goTo('register')"
-          @keydown.enter="goTo('register')"
-          @keydown.space.prevent="goTo('register')"
+          @click="handleRegisterClick()"
+          @keydown.enter="handleRegisterClick()"
+          @keydown.space.prevent="handleRegisterClick()"
           aria-label="Sign Up"
         >Sign Up</button>
       </section>
+
+      <!-- 提示弹窗 -->
+      <div v-if="showNotification" class="notification" role="alert" aria-live="assertive">
+        {{ notificationMessage }}
+      </div>
     </div>
     <nav class="sidebar">
       <button 
@@ -204,9 +209,45 @@ import ReviewCarousel from '../components/ReviewCarousel.vue';
 const router = useRouter();
 
 const route = useRoute();
+// 提示相关状态
+const showNotification = ref(false);
+const notificationMessage = ref('');
+
 function goTo(page) {
   // 直接执行跳转，不使用延迟
   router.push(`/${page}`);
+}
+
+// 处理登录按钮点击
+function handleLoginClick() {
+  // 显示登录提示
+  notificationMessage.value = 'Logging in...';
+  showNotification.value = true;
+  console.log('Login button clicked - showing notification');
+
+  // 直接跳转
+  goTo('login');
+
+  // 2秒后隐藏提示
+  setTimeout(() => {
+    showNotification.value = false;
+  }, 2000);
+}
+
+// 处理注册按钮点击
+function handleRegisterClick() {
+  // 显示注册提示
+  notificationMessage.value = 'Signing up...';
+  showNotification.value = true;
+  console.log('Register button clicked - showing notification');
+
+  // 直接跳转
+  goTo('register');
+
+  // 2秒后隐藏提示
+  setTimeout(() => {
+    showNotification.value = false;
+  }, 2000);
 }
 const searchInput = ref('');
 const emailSentSuccess = ref(false);
