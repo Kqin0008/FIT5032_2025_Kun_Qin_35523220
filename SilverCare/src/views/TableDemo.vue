@@ -4,6 +4,10 @@
       <header class="table-header">
         <button class="back-btn" @click="goBack" @keydown.enter="goBack" @keydown.space="goBack" aria-label="Go back to previous page">← Back</button>
         <h1>Interactive Tables</h1>
+        <div class="download-buttons">
+          <button class="download-btn" @click="downloadUsersCSV" aria-label="Download users data as CSV">Download Users CSV</button>
+          <button class="download-btn" @click="downloadEventsCSV" aria-label="Download events data as CSV">Download Events CSV</button>
+        </div>
       </header>
       <div class="tables-container">
         <div class="table-section">
@@ -32,6 +36,13 @@
 <script setup>
 import DataTableComponent from '../components/DataTableComponent.vue';
 import { ref } from 'vue';
+import { exportToCSV } from '../services/exportService.js';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+function goBack() {
+  router.back();
+}
 
 // User table columns
 const userColumns = [
@@ -63,6 +74,15 @@ const usersData = ref(Array.from({ length: 50 }, (_, index) => ({
   role: ['user', 'admin', 'editor'][Math.floor(Math.random() * 3)]
 })));
 
+// Export functions
+function downloadUsersCSV() {
+  exportToCSV(usersData.value, 'users_data.csv', userColumns);
+}
+
+function downloadEventsCSV() {
+  exportToCSV(eventsData.value, 'events_data.csv', eventColumns);
+}
+
 // Generate mock event data
 const eventsData = ref(Array.from({ length: 50 }, (_, index) => ({
   id: index + 1,
@@ -75,6 +95,49 @@ const eventsData = ref(Array.from({ length: 50 }, (_, index) => ({
 </script>
 
 <style scoped>
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px 0;
+}
+
+.download-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.download-btn {
+  padding: 8px 16px;
+  background-color: #1ab3a6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.download-btn:hover {
+  background-color: #148f84;
+}
+
+.back-btn {
+  padding: 8px 16px;
+  background-color: transparent;
+  color: #1ab3a6;
+  border: 1px solid #1ab3a6;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.back-btn:hover {
+  background-color: rgba(26, 179, 166, 0.1);
+}
+
 .table-demo {
   padding: 20px;
 }
