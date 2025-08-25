@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { authState } from './auth.js';
 import Home from './views/Home.vue';
 import News from './views/News.vue';
 import Event from './views/Event.vue';

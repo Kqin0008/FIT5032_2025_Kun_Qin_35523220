@@ -8,26 +8,27 @@
           placeholder="Search for health tips, events, or services..." 
           v-model="searchQuery"
           @input="handleSearch"
+          aria-label="Search favorites input"
         />
         <div class="search-results" v-if="searchResults.length > 0">
-          <div class="result-item" v-for="result in searchResults" :key="result.id">
+          <div class="result-item" v-for="result in searchResults" :key="result.id" role="article" :aria-label="'Search result: ' + result.title">
             <h3>{{ result.title }}</h3>
             <p>{{ result.description }}</p>
-            <button @click="addFavorite(result)">Add to Favorites</button>
+            <button @click="addFavorite(result)" @keydown.enter="addFavorite(result)" @keydown.space="addFavorite(result)" :aria-label="'Add ' + result.title + ' to favorites'">Add to Favorites</button>
           </div>
         </div>
-        <div class="no-results" v-else-if="searchQuery && !searchResults.length">
+        <div class="no-results" v-else-if="searchQuery && !searchResults.length" role="alert" aria-live="polite">
           <p>No results found for "{{ searchQuery }}"</p>
         </div>
         <div class="fav-list">
-          <div v-if="favorites.length === 0" class="empty">No favorites yet.</div>
-          <div v-for="item in favorites" :key="item.id" class="fav-item">
+          <div v-if="favorites.length === 0" class="empty" role="status" aria-live="polite">No favorites yet.</div>
+          <div v-for="item in favorites" :key="item.id" class="fav-item" role="article" :aria-label="'Favorite item: ' + item.title">
             <span>{{ item.title }}</span>
-            <button class="remove-btn" @click="removeFavorite(item.id)">Remove</button>
+            <button class="remove-btn" @click="removeFavorite(item.id)" @keydown.enter="removeFavorite(item.id)" @keydown.space="removeFavorite(item.id)" :aria-label="'Remove ' + item.title + ' from favorites'">Remove</button>
           </div>
         </div>
       </div>
-      <div v-else class="not-logged">Please log in to view your favorites.</div>
+      <div v-else class="not-logged" role="alert" aria-live="polite">Please log in to view your favorites.</div>
     </div>
   </div>
 </template>

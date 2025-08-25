@@ -1,23 +1,30 @@
 <template>
-  <div class="table-demo">
-    <h1>Interactive Table Demo</h1>
-
-    <div class="table-section">
-      <DataTableComponent
-        title="Users Table"
-        :columns="userColumns"
-        :items="usersData"
-        :rows="10"
-      />
-    </div>
-
-    <div class="table-section">
-      <DataTableComponent
-        title="Events Table"
-        :columns="eventColumns"
-        :items="eventsData"
-        :rows="10"
-      />
+  <div class="center-layout">
+    <div class="table-demo-page">
+      <header class="table-header">
+        <button class="back-btn" @click="goBack" @keydown.enter="goBack" @keydown.space="goBack" aria-label="Go back to previous page">← Back</button>
+        <h1>Interactive Tables</h1>
+      </header>
+      <div class="tables-container">
+        <div class="table-section">
+          <DataTableComponent
+            title="Users Table"
+            :columns="userColumns"
+            :items="usersData"
+            :rows="10"
+            aria-label="Users data table"
+          />
+        </div>
+        <div class="table-section">
+          <DataTableComponent
+            title="Events Table"
+            :columns="eventColumns"
+            :items="eventsData"
+            :rows="10"
+            aria-label="Events data table"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>

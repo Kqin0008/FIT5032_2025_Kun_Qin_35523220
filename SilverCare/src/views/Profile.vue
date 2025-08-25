@@ -5,22 +5,22 @@
       <div v-if="user">
         <form @submit.prevent="saveProfile">
           <div class="form-group">
-            <label>Name</label>
-            <input v-model="editUser.name" type="text" required />
+            <label for="name">Name</label>
+            <input id="name" v-model="editUser.name" type="text" required aria-label="User name" />
           </div>
           <div class="form-group">
-            <label>Email</label>
-            <input v-model="editUser.email" type="email" required disabled />
+            <label for="email">Email</label>
+            <input id="email" v-model="editUser.email" type="email" required disabled aria-label="User email" />
           </div>
           <div class="form-group">
-            <label>Role</label>
-            <input v-model="editUser.role" type="text" disabled />
+            <label for="role">Role</label>
+            <input id="role" v-model="editUser.role" type="text" disabled aria-label="User role" />
           </div>
-          <button class="profile-btn" type="submit">Save</button>
+          <button class="profile-btn" type="submit" @keydown.enter="saveProfile" @keydown.space="saveProfile" aria-label="Save profile">Save</button>
         </form>
-        <div v-if="saved" class="saved-msg">Profile saved!</div>
-        <button class="logout-btn" @click="handleLogout">Logout</button>
-        <div v-if="user.role === 'admin'" class="admin-msg">You are an admin. You have access to admin features.</div>
+        <div v-if="saved" class="saved-msg" role="alert" aria-live="polite">Profile saved!</div>
+        <button class="logout-btn" @click="handleLogout" @keydown.enter="handleLogout" @keydown.space="handleLogout" aria-label="Logout">Logout</button>
+        <div v-if="user.role === 'admin'" class="admin-msg" role="status" aria-live="polite">You are an admin. You have access to admin features.</div>
       </div>
       <div v-else class="not-logged">Please log in to view your profile.</div>
     </div>
@@ -152,4 +152,4 @@ input:focus {
   font-weight: bold;
   font-size: 1.05rem;
 }
-</style> 
+</style>

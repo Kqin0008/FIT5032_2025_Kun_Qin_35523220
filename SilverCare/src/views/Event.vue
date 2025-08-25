@@ -6,55 +6,68 @@
         <h1>Event Registration</h1>
       </header>
       <div class="event-container">
-        <div class="calendar-section">
-          <div class="calendar-header">
-            <button class="nav-btn" @click="previousMonth">‹</button>
-            <h2>{{ currentMonthYear }}</h2>
-            <button class="nav-btn" @click="nextMonth">›</button>
-          </div>
-          <div class="calendar-grid">
-            <div class="weekday" v-for="day in weekdays" :key="day">{{ day }}</div>
-            <div 
-              v-for="date in calendarDates" 
-              :key="date.key"
-              :class="['calendar-day', { 
-                'other-month': !date.currentMonth,
-                'today': date.isToday,
-                'has-event': date.hasEvent,
-                'selected': selectedDate === date.key
-              }]"
-              @click="selectDate(date)"
-            >
-              {{ date.day }}
-              <div v-if="date.hasEvent" class="event-indicator">●</div>
-            </div>
-          </div>
+      <div class="calendar-section">
+        <div class="calendar-header">
+          <button class="nav-btn" @click="previousMonth" @keydown.enter="previousMonth" @keydown.space="previousMonth" aria-label="Previous month">‹</button>
+          <h2>{{ currentMonthYear }}</h2>
+          <button class="nav-btn" @click="nextMonth" @keydown.enter="nextMonth" @keydown.space="nextMonth" aria-label="Next month">›</button>
         </div>
-        <div class="booking-section">
-          <h3>Tai Chi Class Booking</h3>
-          <div v-if="selectedDate" class="selected-date">
-            Selected: {{ formatDate(selectedDate) }}
-          </div>
-          <div class="time-slots">
-            <div 
-              v-for="slot in availableSlots" 
-              :key="slot.time"
-              :class="['time-slot', { 'booked': slot.booked }]"
-              @click="bookSlot(slot)"
-            >
-              <span class="time">{{ slot.time }}</span>
-              <span class="status">{{ slot.booked ? 'Booked' : 'Available' }}</span>
-            </div>
-          </div>
-          <button 
-            v-if="selectedSlot" 
-            class="book-btn" 
-            @click="confirmBooking"
+        <div class="calendar-grid">
+          <div class="weekday" v-for="day in weekdays" :key="day">{{ day }}</div>
+          <div 
+            v-for="date in calendarDates" 
+            :key="date.key"
+            :class="['calendar-day', { 
+              'other-month': !date.currentMonth,
+              'today': date.isToday,
+              'has-event': date.hasEvent,
+              'selected': selectedDate === date.key
+            }]"
+            @click="selectDate(date)"
+            @keydown.enter="selectDate(date)"
+            @keydown.space="selectDate(date)"
+            :tabindex="date.currentMonth ? '0' : '-1'"
+            :aria-label="`${date.day} ${date.currentMonth ? '' : '(outside current month)'}`"
+            :aria-selected="selectedDate === date.key"
+            role="button"
           >
-            Confirm Booking
-          </button>
+            {{ date.day }}
+            <div v-if="date.hasEvent" class="event-indicator" aria-label="Has event">●</div>
+          </div>
         </div>
       </div>
+      <div class="booking-section">
+        <h3>Tai Chi Class Booking</h3>
+        <div v-if="selectedDate" class="selected-date">
+          Selected: {{ formatDate(selectedDate) }}
+        </div>
+        <div class="time-slots">
+          <div 
+            v-for="slot in availableSlots" 
+            :key="slot.time"
+            :class="['time-slot', { 'booked': slot.booked }]"
+            @click="bookSlot(slot)"
+            @keydown.enter="bookSlot(slot)"
+            @keydown.space="bookSlot(slot)"
+            :tabindex="slot.booked ? '-1' : '0'"
+            :aria-label="`${slot.time} - ${slot.booked ? 'Booked' : 'Available'}`"
+            role="button"
+          >
+            <span class="time">{{ slot.time }}</span>
+            <span class="status">{{ slot.booked ? 'Booked' : 'Available' }}</span>
+          </div>
+        </div>
+        <button 
+          v-if="selectedSlot" 
+          class="book-btn" 
+          @click="confirmBooking"
+          @keydown.enter="confirmBooking"
+          @keydown.space="confirmBooking"
+        >
+          Confirm Booking
+        </button>
+      </div>
+    </div>
     </div>
   </div>
 </template>
@@ -407,4 +420,4 @@ function formatDate(dateString) {
     font-size: 0.8rem;
   }
 }
-</style> 
+</style>

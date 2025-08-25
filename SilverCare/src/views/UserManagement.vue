@@ -8,26 +8,27 @@
         type="email" 
         placeholder="Search user by email"
         @keyup.enter="searchUser"
+        aria-label="Search user by email input"
       >
-      <button @click="searchUser">Search</button>
+      <button @click="searchUser" @keydown.enter="searchUser" @keydown.space="searchUser" aria-label="Search user button">Search</button>
     </div>
     
-    <div v-if="foundUser.email" class="user-card">
+    <div v-if="foundUser.email" class="user-card" role="region" aria-label="User card for {{ foundUser.name }}">
       <h3>Edit User: {{ foundUser.name }}</h3>
       <div class="form-group">
         <label>Email:</label>
-        <input v-model="foundUser.email" disabled>
+        <input v-model="foundUser.email" disabled aria-label="User email for {{ foundUser.name }}">
       </div>
       <div class="form-group">
         <label>Name:</label>
-        <input v-model="foundUser.name">
+        <input v-model="foundUser.name" aria-label="User name input for {{ foundUser.name }}">
       </div>
-      <button @click="updateUser">Update</button>
-      <button @click="resetSearch">Cancel</button>
+      <button @click="updateUser" @keydown.enter="updateUser" @keydown.space="updateUser" :aria-label="'Update user ' + foundUser.name">Update</button>
+      <button @click="resetSearch" @keydown.enter="resetSearch" @keydown.space="resetSearch" aria-label="Cancel editing user">Cancel</button>
     </div>
     
-    <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-    <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
+    <div v-if="errorMessage" class="error-message" aria-live="polite">{{ errorMessage }}</div>
+    <div v-if="successMessage" class="success-message" aria-live="polite">{{ successMessage }}</div>
   </div>
 </template>
 

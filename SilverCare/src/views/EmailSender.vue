@@ -4,20 +4,20 @@
     <div class="form-container">
       <div class="form-group">
         <label for="to">To:</label>
-        <InputText id="to" v-model="to" placeholder="Recipient's email address" class="w-full" />
-        <span v-if="errors.to" class="error">{{ errors.to }}</span>
+        <InputText id="to" v-model="to" placeholder="Recipient's email address" class="w-full" aria-describedby="to-error" />
+        <span v-if="errors.to" id="to-error" class="error" role="alert">{{ errors.to }}</span>
       </div>
 
       <div class="form-group">
         <label for="subject">Subject:</label>
-        <InputText id="subject" v-model="subject" placeholder="Email subject" class="w-full" />
-        <span v-if="errors.subject" class="error">{{ errors.subject }}</span>
+        <InputText id="subject" v-model="subject" placeholder="Email subject" class="w-full" aria-describedby="subject-error" />
+        <span v-if="errors.subject" id="subject-error" class="error" role="alert">{{ errors.subject }}</span>
       </div>
 
       <div class="form-group">
         <label for="body">Body:</label>
-        <textarea id="body" v-model="body" placeholder="Email content" class="w-full" rows="6"></textarea>
-        <span v-if="errors.body" class="error">{{ errors.body }}</span>
+        <textarea id="body" v-model="body" placeholder="Email content" class="w-full" rows="6" aria-describedby="body-error"></textarea>
+        <span v-if="errors.body" id="body-error" class="error" role="alert">{{ errors.body }}</span>
       </div>
 
       <div class="form-group">
@@ -27,10 +27,10 @@
         <button v-if="selectedFile" @click="removeAttachment" class="remove-btn">Remove</button>
       </div>
 
-      <Button label="Send Email" @click="handleSendEmail" :loading="sending" :disabled="sending" class="send-btn" />
+      <Button label="Send Email" @click="handleSendEmail" :loading="sending" :disabled="sending" class="send-btn" @keydown.enter="handleSendEmail" @keydown.space="handleSendEmail" />
 
-      <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
-      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+      <div v-if="successMessage" class="success-message" role="alert">{{ successMessage }}</div>
+      <div v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</div>
     </div>
   </div>
 </template>

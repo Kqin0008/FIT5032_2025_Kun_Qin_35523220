@@ -6,22 +6,23 @@
         <h1>Search</h1>
       </header>
       <div class="search-container">
-        <input 
-          class="search-input" 
-          placeholder="Search for health tips, events, or services..." 
-          v-model="searchQuery"
-          @input="handleSearch"
-        />
-        <div class="search-results" v-if="searchResults.length > 0">
-          <div class="result-item" v-for="result in searchResults" :key="result.id">
-            <h3>{{ result.title }}</h3>
-            <p>{{ result.description }}</p>
-          </div>
-        </div>
-        <div class="no-results" v-else-if="searchQuery && !searchResults.length">
-          <p>No results found for "{{ searchQuery }}"</p>
+      <input 
+        class="search-input" 
+        placeholder="Search for health tips, events, or services..." 
+        v-model="searchQuery"
+        @input="handleSearch"
+        aria-label="Search input"
+      />
+      <div class="search-results" v-if="searchResults.length > 0">
+        <div class="result-item" v-for="result in searchResults" :key="result.id" role="article" :aria-label="'Search result: ' + result.title">
+          <h3>{{ result.title }}</h3>
+          <p>{{ result.description }}</p>
         </div>
       </div>
+      <div class="no-results" v-else-if="searchQuery && !searchResults.length" role="alert" aria-live="polite">
+        <p>No results found for "{{ searchQuery }}"</p>
+      </div>
+    </div>
     </div>
   </div>
 </template>
@@ -164,4 +165,4 @@ onMounted(() => {
     width: 98vw;
   }
 }
-</style> 
+</style>

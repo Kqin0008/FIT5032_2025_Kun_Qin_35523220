@@ -1,42 +1,90 @@
 <template>
   <div class="main-layout">
-  <div v-if="emailSentSuccess" class="email-success-notification">
+  <div v-if="emailSentSuccess" class="email-success-notification" role="alert" aria-live="polite">
     send email successfully
   </div>
     <div class="container">
       <header class="header">
-        <div class="logo">SilverCare</div>
+        <div class="logo" aria-label="SilverCare logo">SilverCare</div>
         <form class="search-form" @submit="handleSearch">
-          <input class="search-bar" v-model="searchInput" placeholder="Search..." />
+          <input 
+            class="search-bar" 
+            v-model="searchInput" 
+            placeholder="Search..." 
+            aria-label="Search"
+            @keydown.enter="handleSearch"
+          />
         </form>
-        <div class="user-avatar"></div>
+        <div class="user-avatar" role="img" aria-label="User avatar"></div>
         <div class="header-buttons">
-          <button class="email-btn" @click="goTo('emailSender')">E</button>
-          <button class="table-btn" @click="goTo('tableDemo')">T</button>
-          <button class="map-btn" @click="goTo('mapView')">M</button>
+          <button 
+            class="email-btn" 
+            @click="goTo('email')"
+            @keydown.enter="goTo('email')"
+            @keydown.space.prevent="goTo('email')"
+            aria-label="Send email"
+          >E</button>
+          <button 
+            class="table-btn" 
+            @click="goTo('tables')"
+            @keydown.enter="goTo('tables')"
+            @keydown.space.prevent="goTo('tables')"
+            aria-label="View tables"
+          >T</button>
+          <button 
+            class="map-btn" 
+            @click="goTo('map')"
+            @keydown.enter="goTo('map')"
+            @keydown.space.prevent="goTo('map')"
+            aria-label="View map"
+          >M</button>
         </div>
       </header>
       <section class="banner">
         <h1>Caring for Seniors' Health,<br />Connecting Community Resources</h1>
       </section>
       <section class="cards">
-        <div class="card" @click="goTo('news')">
+        <div 
+          class="card" 
+          @click="goTo('news')"
+          @keydown.enter="goTo('news')"
+          @keydown.space.prevent="goTo('news')"
+          tabindex="0"
+          role="button"
+          aria-label="View Health News"
+        >
           <div class="icon health">
-            <svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#b2dfdb"/><text x="16" y="21" text-anchor="middle" font-size="16" fill="#1ab3a6">H</text></svg>
+            <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="#b2dfdb"/><text x="16" y="21" text-anchor="middle" font-size="16" fill="#1ab3a6">H</text></svg>
           </div>
           <div class="title">Health News</div>
           <div class="desc">Daily Tips</div>
         </div>
-        <div class="card" @click="goTo('event')">
+        <div 
+          class="card" 
+          @click="goTo('event')"
+          @keydown.enter="goTo('event')"
+          @keydown.space.prevent="goTo('event')"
+          tabindex="0"
+          role="button"
+          aria-label="View Event Registration"
+        >
           <div class="icon event">
-            <svg width="32" height="32" viewBox="0 0 32 32"><rect x="4" y="8" width="24" height="16" rx="4" fill="#b2dfdb"/><text x="16" y="22" text-anchor="middle" font-size="16" fill="#1ab3a6">E</text></svg>
+            <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="8" width="24" height="16" rx="4" fill="#b2dfdb"/><text x="16" y="22" text-anchor="middle" font-size="16" fill="#1ab3a6">E</text></svg>
           </div>
           <div class="title">Event Registration</div>
           <div class="desc"><button class="pill">Tai Chi Class</button></div>
         </div>
-        <div class="card" @click="goTo('rating')">
+        <div 
+          class="card" 
+          @click="goTo('rating')"
+          @keydown.enter="goTo('rating')"
+          @keydown.space.prevent="goTo('rating')"
+          tabindex="0"
+          role="button"
+          aria-label="View Peer Rating"
+        >
           <div class="icon rating">
-            <svg width="32" height="32" viewBox="0 0 32 32"><polygon points="16,4 20,20 4,12 28,12 12,20" fill="#ffc107"/></svg>
+            <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><polygon points="16,4 20,20 4,12 28,12 12,20" fill="#ffc107"/></svg>
           </div>
           <div class="title">Peer Rating</div>
           <div class="desc">
@@ -47,33 +95,71 @@
         </div>
       </section>
       <section class="actions">
-        <button class="pill" @click="goTo('login')">Log In</button>
-        <button class="pill primary" @click="goTo('register')">Sign Up</button>
+        <button 
+          class="pill" 
+          @click="goTo('login')"
+          @keydown.enter="goTo('login')"
+          @keydown.space.prevent="goTo('login')"
+          aria-label="Log In"
+        >Log In</button>
+        <button 
+          class="pill primary" 
+          @click="goTo('register')"
+          @keydown.enter="goTo('register')"
+          @keydown.space.prevent="goTo('register')"
+          aria-label="Sign Up"
+        >Sign Up</button>
       </section>
     </div>
     <nav class="sidebar">
-      <button class="icon search" @click="goTo('search')">
-        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="#1ab3a6" stroke-width="2" fill="none"/><line x1="17" y1="17" x2="22" y2="22" stroke="#1ab3a6" stroke-width="2"/></svg>
+      <button 
+        class="icon search" 
+        @click="goTo('search')"
+        @keydown.enter="goTo('search')"
+        @keydown.space.prevent="goTo('search')"
+        aria-label="Search"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8" stroke="#1ab3a6" stroke-width="2" fill="none"/><line x1="17" y1="17" x2="22" y2="22" stroke="#1ab3a6" stroke-width="2"/></svg>
       </button>
-      <button class="icon user" @click="goTo('profile')">
-        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="9" r="4" stroke="#1ab3a6" stroke-width="2" fill="none"/><rect x="4" y="17" width="16" height="4" rx="2" stroke="#1ab3a6" stroke-width="2" fill="none"/></svg>
+      <button 
+        class="icon user" 
+        @click="goTo('profile')"
+        @keydown.enter="goTo('profile')"
+        @keydown.space.prevent="goTo('profile')"
+        aria-label="User profile"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="4" stroke="#1ab3a6" stroke-width="2" fill="none"/><rect x="4" y="17" width="16" height="4" rx="2" stroke="#1ab3a6" stroke-width="2" fill="none"/></svg>
       </button>
-      <button class="icon star" @click="goTo('favorites')">
-        <svg width="24" height="24" viewBox="0 0 24 24"><polygon points="12,3 15,10 22,10 17,14 18,21 12,17 6,21 7,14 2,10 9,10" fill="#ffc107"/></svg>
+      <button 
+        class="icon star" 
+        @click="goTo('favorites')"
+        @keydown.enter="goTo('favorites')"
+        @keydown.space.prevent="goTo('favorites')"
+        aria-label="Favorites"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,3 15,10 22,10 17,14 18,21 12,17 6,21 7,14 2,10 9,10" fill="#ffc107"/></svg>
       </button>
     </nav>
     <div 
       v-if="isAdminInHomePage" 
       class="admin-btn-float"
     >
-      <router-link to="/admin/users">M</router-link>
+      <router-link to="/admin/users" aria-label="Admin panel" role="button">M</router-link>
     </div>
 
     
     <!-- Modal for tables -->
     <div v-if="showTables" class="tables-modal">
       <div class="tables-modal-content">
-        <span class="close" @click="showTables = false">&times;</span>
+        <span 
+          class="close" 
+          @click="showTables = false"
+          @keydown.enter="showTables = false"
+          @keydown.space.prevent="showTables = false"
+          tabindex="0"
+          role="button"
+          aria-label="Close modal"
+        >&times;</span>
         <h2>Interactive Tables</h2>
         <div class="table-section">
           <DataTableComponent
@@ -108,7 +194,8 @@ const router = useRouter();
 
 const route = useRoute();
 function goTo(page) {
-  router.push({ name: page.charAt(0).toUpperCase() + page.slice(1) });
+  // 直接执行跳转，不使用延迟
+  router.push(`/${page}`);
 }
 const searchInput = ref('');
 const emailSentSuccess = ref(false);
@@ -283,6 +370,11 @@ const isAdminInHomePage = computed(() => {
   align-items: center;
   cursor: pointer;
   transition: box-shadow 0.2s;
+  outline: none;
+}
+.card:focus {
+  outline: 2px solid #1ab3a6;
+  outline-offset: 2px;
 }
 .card:hover {
   box-shadow: 0 4px 16px rgba(26,179,166,0.12);
@@ -558,7 +650,7 @@ const isAdminInHomePage = computed(() => {
   padding: 20px 40px;
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
+  z-index: 9999; /* 确保浮于所有元素上方 */
   font-weight: bold;
   font-size: 1.1rem;
 }

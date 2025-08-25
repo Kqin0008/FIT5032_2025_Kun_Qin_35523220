@@ -7,6 +7,7 @@
         placeholder="Search..."
         class="w-full"
         @input="applyFilter"
+        aria-label="Search table data input"
       />
     </div>
     <DataTable
@@ -20,6 +21,7 @@
       :sortOrder="sortOrder"
       @sort-change="onSortChange"
       responsive
+      aria-label="Data table"
     >
       <Column v-for="column in columns" :key="column.field"
         :field="column.field"
@@ -33,6 +35,7 @@
             v-model="slotProps.filterModel.value"
             placeholder="{{ `Search ${column.header}...` }}"
             @input="() => applyColumnFilter(column.field, slotProps.filterModel.value)"
+            :aria-label="'Search ' + column.header + ' column input'"
           />
         </template>
       </Column>

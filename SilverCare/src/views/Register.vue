@@ -5,29 +5,65 @@
       <form @submit.prevent="handleRegister">
         <div class="form-group">
           <label for="name">Name</label>
-          <input id="name" v-model="name" type="text" required />
-          <span v-if="nameError" class="error">{{ nameError }}</span>
+          <input 
+            id="name" 
+            v-model="name" 
+            type="text" 
+            required 
+            aria-describedby="name-error"
+            @keydown.enter="handleRegister"
+            aria-label="User name"
+          />
+          <span v-if="nameError" id="name-error" class="error" role="alert" aria-live="polite">{{ nameError }}</span>
         </div>
         <div class="form-group">
           <label for="email">Email</label>
-          <input id="email" v-model="email" type="email" required />
-          <span v-if="emailError" class="error">{{ emailError }}</span>
+          <input 
+            id="email" 
+            v-model="email" 
+            type="email" 
+            required 
+            aria-describedby="email-error"
+            @keydown.enter="handleRegister"
+            aria-label="Email address"
+          />
+          <span v-if="emailError" id="email-error" class="error" role="alert" aria-live="polite">{{ emailError }}</span>
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input id="password" v-model="password" type="password" required />
-          <span v-if="passwordError" class="error">{{ passwordError }}</span>
+          <input 
+            id="password" 
+            v-model="password" 
+            type="password" 
+            required 
+            aria-describedby="password-error"
+            @keydown.enter="handleRegister"
+            aria-label="Password"
+          />
+          <span v-if="passwordError" id="password-error" class="error" role="alert" aria-live="polite">{{ passwordError }}</span>
         </div>
         <div class="form-group">
           <label for="role">Role</label>
-          <select id="role" v-model="role" required>
+          <select 
+            id="role" 
+            v-model="role" 
+            required
+            @keydown.enter="handleRegister"
+            aria-label="User role"
+          >
             <option value="user">User</option>
             <option value="admin">Admin</option>
           </select>
         </div>
-        <button class="auth-btn" type="submit">Register</button>
-        <div v-if="registerError" class="error">{{ registerError }}</div>
-        <div v-if="registerSuccess" class="success">register successfully! Redirecting to home page...</div>
+        <button 
+          class="auth-btn" 
+          type="submit"
+          @keydown.space.prevent="handleRegister"
+          @keydown.enter="handleRegister"
+          aria-label="Register button"
+        >Register</button>
+        <div v-if="registerError" class="error" role="alert" aria-live="polite">{{ registerError }}</div>
+        <div v-if="registerSuccess" class="success" role="alert" aria-live="polite">register successfully! Redirecting to home page...</div>
       </form>
       <div class="switch-link">
         Already have an account? <router-link to="/login">Login</router-link>
@@ -118,16 +154,15 @@ async function handleRegister() {
     registerSuccess.value = true;
     console.log('registerSuccess set to true');
     
-    // 使用nextTick确保DOM更新
-    await nextTick();
-    console.log('DOM updated, success message should be visible');
+    // 移除不必要的nextTick等待
+    console.log('Success message should be visible');
     
-    // 2秒后跳转并重置状态
+    // 缩短延迟时间为1秒
     setTimeout(() => {
       console.log('Redirecting to home page');
       router.push('/');
       registerSuccess.value = false; // 跳转后隐藏提示
-    }, 2000);
+    }, 1000);
   } catch (error) {
     registerError.value = error.message;
     // 特别处理邮箱已存在的错误
@@ -186,6 +221,8 @@ select {
 input:focus,
 select:focus {
   border-color: #1ab3a6;
+  outline: 2px solid #1ab3a6;
+  outline-offset: 2px;
 }
 .auth-btn {
   width: 100%;
@@ -199,6 +236,11 @@ select:focus {
   cursor: pointer;
   margin-top: 8px;
   transition: background 0.2s;
+  outline: none;
+}
+.auth-btn:focus {
+  outline: 2px solid #1ab3a6;
+  outline-offset: 2px;
 }
 .auth-btn:hover {
   background: #6ed6c5;

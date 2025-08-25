@@ -2,13 +2,13 @@
   <div class="center-layout">
     <div class="news-page">
       <header class="news-header">
-        <button class="back-btn" @click="goBack">← Back</button>
+        <button class="back-btn" @click="goBack" @keydown.enter="goBack" @keydown.space="goBack" aria-label="Go back to previous page">← Back</button>
         <h1>Health News</h1>
       </header>
       <div class="news-container">
         <div class="quote-card" v-for="(quote, index) in shuffledQuotes" :key="index">
-          <div class="quote-icon">💡</div>
-          <div class="quote-text">{{ quote }}</div>
+          <div class="quote-icon" aria-label="Health tip icon">💡</div>
+          <div class="quote-text" role="article" aria-label="Health tip">{{ quote }}</div>
         </div>
       </div>
     </div>
@@ -154,4 +154,4 @@ onMounted(() => {
     font-size: 1.1rem;
   }
 }
-</style> 
+</style>

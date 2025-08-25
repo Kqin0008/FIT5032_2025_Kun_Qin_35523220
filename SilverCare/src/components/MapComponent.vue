@@ -6,29 +6,30 @@
         v-model="searchQuery"
         placeholder="Search for a place..."
         class="search-input"
+        aria-label="Search for a place input"
       />
-      <Button @click="searchPlace" label="Search" class="search-btn" />
+      <Button @click="searchPlace" @keydown.enter="searchPlace" @keydown.space="searchPlace" label="Search" class="search-btn" aria-label="Search for place button" />
     </div>
 
     <div class="route-planner">
       <h3>Route Planner</h3>
       <div class="route-inputs">
         <div class="input-group">
-          <label>From:</label>
-          <InputText v-model="startLocation" placeholder="Enter start location" />
+          <label for="startLocation">From:</label>
+          <InputText id="startLocation" v-model="startLocation" placeholder="Enter start location" aria-label="Start location input" />
         </div>
         <div class="input-group">
-          <label>To:</label>
-          <InputText v-model="endLocation" placeholder="Enter destination" />
+          <label for="endLocation">To:</label>
+          <InputText id="endLocation" v-model="endLocation" placeholder="Enter destination" aria-label="Destination input" />
         </div>
         <div class="input-group">
-          <label>Mode:</label>
-          <select v-model="routeMode" class="route-mode-select">
+          <label for="routeMode">Mode:</label>
+          <select id="routeMode" v-model="routeMode" class="route-mode-select" aria-label="Route mode selection">
             <option value="driving">Driving</option>
             <option value="walking">Walking</option>
           </select>
         </div>
-        <Button @click="calculateRoute" label="Get Route" class="route-btn" />
+        <Button @click="calculateRoute" @keydown.enter="calculateRoute" @keydown.space="calculateRoute" label="Get Route" class="route-btn" aria-label="Get route button" />
       </div>
     </div>
 
@@ -37,7 +38,7 @@
     <div v-if="places.length > 0" class="search-results">
       <h3>Search Results</h3>
       <ul>
-        <li v-for="place in places" :key="place.id" @click="selectPlace(place)">
+        <li v-for="place in places" :key="place.id" @click="selectPlace(place)" @keydown.enter="selectPlace(place)" @keydown.space="selectPlace(place)" role="button" tabindex="0" :aria-label="'Select place: ' + place.name">
           {{ place.name }}
           <span class="location">{{ place.address }}</span>
         </li>
@@ -424,6 +425,15 @@ async function calculateRoute() {
 
 .search-btn {
   white-space: nowrap;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 32px;
+  background: #1ab3a6;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
 .route-planner {
@@ -453,6 +463,15 @@ async function calculateRoute() {
 .route-btn {
   align-self: flex-end;
   white-space: nowrap;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 32px;
+  background: #1ab3a6;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
 .route-mode-select {

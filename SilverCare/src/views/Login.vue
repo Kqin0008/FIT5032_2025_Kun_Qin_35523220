@@ -5,19 +5,42 @@
       <form @submit.prevent="handleLogin">
         <div class="form-group">
           <label for="email">Email</label>
-          <input id="email" v-model="email" type="email" required />
-          <span v-if="emailError" class="error">{{ emailError }}</span>
+          <input 
+            id="email" 
+            v-model="email" 
+            type="email" 
+            required 
+            aria-describedby="email-error"
+            @keydown.enter="handleLogin"
+            aria-label="Email address"
+          />
+          <span v-if="emailError" id="email-error" class="error" role="alert" aria-live="polite">{{ emailError }}</span>
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input id="password" v-model="password" type="password" required />
-          <span v-if="passwordError" class="error">{{ passwordError }}</span>
+          <input 
+            id="password" 
+            v-model="password" 
+            type="password" 
+            required 
+            aria-describedby="password-error"
+            @keydown.enter="handleLogin"
+            aria-label="Password"
+          />
+          <span v-if="passwordError" id="password-error" class="error" role="alert" aria-live="polite">{{ passwordError }}</span>
         </div>
-        <button class="auth-btn" type="submit" :disabled="loading">
+        <button 
+          class="auth-btn" 
+          type="submit" 
+          :disabled="loading"
+          @keydown.space.prevent="handleLogin"
+          @keydown.enter="handleLogin"
+          aria-label="Login button"
+        >
           {{ loading ? 'Logging in...' : 'Login' }}
         </button>
-        <div v-if="loginError" class="error">{{ loginError }}</div>
-        <div v-if="loginSuccess" class="success">login successfully! Redirecting to home page...</div>
+        <div v-if="loginError" class="error" role="alert" aria-live="polite">{{ loginError }}</div>
+        <div v-if="loginSuccess" class="success" role="alert" aria-live="polite">login successfully! Redirecting to home page...</div>
       </form>
       <div class="switch-link">
         Don't have an account? <router-link to="/register">Register</router-link>
@@ -94,21 +117,20 @@ async function handleLogin() {
     loginSuccess.value = true;
     console.log('loginSuccess set to true');
     
-    // 使用nextTick确保DOM更新
-    await nextTick();
-    console.log('DOM updated, success message should be visible');
+    // 移除不必要的nextTick等待
+    console.log('Success message should be visible');
     
-    // 2秒后跳转并重置状态
+    // 缩短延迟时间为1秒，并移除alert
     setTimeout(() => {
       console.log('Redirecting to home page');
-      // Check if user is admin
+      // Check if user is admin (不使用alert)
       if (authState.user && authState.user.role === 'admin') {
         console.log('Admin user detected');
-        alert('Welcome! Administrator!');
+        // 可以使用其他方式通知管理员，如控制台日志或自定义模态框
       }
       router.push('/');
       loginSuccess.value = false; // 跳转后隐藏提示
-    }, 2000);
+    }, 1000);
   } catch (error) {
     console.error('Login failed:', error);
     loginError.value = error.message || 'Login failed. Please try again.';
@@ -163,6 +185,8 @@ input {
 }
 input:focus {
   border-color: #1ab3a6;
+  outline: 2px solid #1ab3a6;
+  outline-offset: 2px;
 }
 .auth-btn {
   width: 100%;
@@ -176,6 +200,11 @@ input:focus {
   cursor: pointer;
   margin-top: 8px;
   transition: background 0.2s;
+  outline: none;
+}
+.auth-btn:focus {
+  outline: 2px solid #1ab3a6;
+  outline-offset: 2px;
 }
 .auth-btn:hover {
   background: #6ed6c5;
