@@ -253,10 +253,19 @@ export const sendBulkEmail = async (recipients, subject, text, attachment) => {
       return result.data;
     } else {
       // Development: Use proxy to send emails via local server
+      // Format data according to SendGrid API requirements
       const sendGridData = {
-        recipients: recipients,
-        subject: subject,
-        text: text,
+        personalizations: [{
+          to: recipients.map(email => ({ email })),
+          subject: subject
+        }],
+        from: {
+          email: import.meta.env.VITE_SENDER_EMAIL || 'your_verified_sender@example.com'
+        },
+        content: [{
+          type: 'text/plain',
+          value: text
+        }],
         attachments: attachments
       };
   

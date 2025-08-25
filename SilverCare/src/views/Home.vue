@@ -7,15 +7,16 @@
       <header class="header">
         <div class="logo" aria-label="SilverCare logo">SilverCare</div>
         <form class="search-form" @submit="handleSearch">
-          <input 
-            class="search-bar" 
-            v-model="searchInput" 
-            placeholder="Search..." 
-            aria-label="Search"
-            @keydown.enter="handleSearch"
-          />
-        </form>
-        <div class="user-avatar" role="img" aria-label="User avatar"></div>
+        <input 
+          class="search-bar" 
+          v-model="searchInput" 
+          placeholder="Search..." 
+          aria-label="Search"
+          @keydown.enter="handleSearch"
+        />
+      </form>
+      
+      <div class="user-avatar" role="img" aria-label="User avatar"></div>
         <div class="header-buttons">
           <button 
             class="email-btn" 
@@ -40,6 +41,10 @@
           >M</button>
         </div>
       </header>
+      
+      <!-- 健康语句轮播 -->
+      <HealthQuoteCarousel :quotes="healthQuotes" />
+      
       <section class="banner">
         <h1>Caring for Seniors' Health,<br />Connecting Community Resources</h1>
       </section>
@@ -94,6 +99,10 @@
           </div>
         </div>
       </section>
+      
+      <!-- 评价语句轮播 -->
+      <ReviewCarousel :reviews="reviews" />
+      
       <section class="actions">
         <button 
           class="pill" 
@@ -189,6 +198,8 @@ import { authState } from '../auth.js';
 import { useRoute } from 'vue-router';
 import { sendEmail } from '../services/emailService.js';
 import DataTableComponent from '../components/DataTableComponent.vue';
+import HealthQuoteCarousel from '../components/HealthQuoteCarousel.vue';
+import ReviewCarousel from '../components/ReviewCarousel.vue';
 
 const router = useRouter();
 
@@ -242,6 +253,52 @@ const eventsData = ref(Array.from({ length: 50 }, (_, index) => ({
   category: ['Fitness', 'Health', 'Arts', 'Education', 'Social'][Math.floor(Math.random() * 5)],
   attendees: Math.floor(Math.random() * 100) + 10
 })));
+
+// 健康语句数据
+const healthQuotes = [
+  "An apple a day, keep a doctor away",
+  "Early to bed and early to rise, makes a man healthy, wealthy and wise",
+  "Health is wealth",
+  "A healthy mind in a healthy body",
+  "Prevention is better than cure",
+  "You are what you eat",
+  "Exercise is medicine for creating change in your body",
+  "The greatest wealth is health"
+];
+
+// 评价数据
+const reviews = [
+  {
+    id: 1,
+    rating: 5,
+    text: "This app is incredibly user-friendly for seniors. The interface is clear and easy to navigate.",
+    author: "Margaret, 72"
+  },
+  {
+    id: 2,
+    rating: 5,
+    text: "The Tai Chi classes have been wonderful for my mobility. Highly recommend!",
+    author: "Robert, 68"
+  },
+  {
+    id: 3,
+    rating: 4,
+    text: "Great health tips and easy to use. The calendar feature is very helpful.",
+    author: "Helen, 75"
+  },
+  {
+    id: 4,
+    rating: 5,
+    text: "Finally an app designed with seniors in mind. The large buttons and clear text make all the difference.",
+    author: "George, 70"
+  },
+  {
+    id: 5,
+    rating: 4,
+    text: "The community features are excellent. I've made new friends through the events.",
+    author: "Dorothy, 69"
+  }
+];
 
 async function sendTestEmail() {
   try {

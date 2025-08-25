@@ -11,6 +11,9 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 模拟数据库存储预约信息
+const appointments = [];
+
 // 中间件
 app.use(cors());
 app.use(express.json());
@@ -67,6 +70,64 @@ app.post('/api/send-email', async (req, res) => {
       details: errorDetails
     });
   }
+});
+
+// 预约处理接口
+app.post('/api/book-appointment', async (req, res) => {
+  try {
+    const { date, time, userId, userName } = req.body;
+
+    // 验证必要参数
+    if (!date || !time || !userId) {
+      return res.status(400).json({
+        success: false,
+        message: '缺少必要的预约参数'
+      });
+    }
+
+    // 检查是否已存在相同时间的预约
+    // 注意：在实际生产环境中，这里应该使用数据库查询
+    // 为了简化示例，我们使用一个内存数组来模拟数据库
+    const existingAppointment = appointments.find(
+      appointment => appointment.date === date && appointment.time === time
+    );
+
+    if (existingAppointment) {
+      return res.status(409).json({
+        success: false,
+        message: '该时间段已被预约'
+      });
+    }
+
+    // 保存预约信息
+    const newAppointment = {
+      id: appointments.length + 1,
+      date,
+      time,
+      userId,
+      userName: userName || '未知用户',
+      createdAt: new Date()
+    };
+
+    appointments.push(newAppointment);
+
+    res.json({
+      success: true,
+      message: '预约成功',
+      data: newAppointment
+    });
+  } catch (error) {
+    console.error('预约处理失败:', error);
+    res.status(500).json({
+      success: false,
+      message: '预约处理失败'
+    });
+  }
+});
+
+// 根路径GET请求处理
+app.get('/', (req, res) => {
+  res.json({ message: '服务器正常运行' });
 });
 
 // 启动服务器

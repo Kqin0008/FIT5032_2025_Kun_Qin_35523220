@@ -7,6 +7,17 @@
   font-weight: normal;
 }
 
+/* 增加header和banner之间的距离 */
+.header {
+  margin-bottom: 3rem;
+}
+
+/* 确保轮播组件在移动设备上也能正确显示 */
+.quote-carousel {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 a,
 .green {
   text-decoration: none;

@@ -2,72 +2,48 @@
   <div class="center-layout">
     <div class="event-page">
       <header class="event-header">
-        <button class="back-btn" @click="goBack">← Back</button>
-        <h1>Event Registration</h1>
+        <button class="back-btn" @click="viewMode === 'slots' ? goToDateSelection() : goBack()">
+          {{ viewMode === 'slots' ? '← Back to Dates' : '← Back' }}
+        </button>
+        <h1>{{ viewMode === 'dates' ? 'Event Registration' : `Book for ${formatDate(selectedDate)}` }}</h1>
       </header>
       <div class="event-container">
-      <div class="calendar-section">
-        <div class="calendar-header">
-          <button class="nav-btn" @click="previousMonth" @keydown.enter="previousMonth" @keydown.space="previousMonth" aria-label="Previous month">‹</button>
-          <h2>{{ currentMonthYear }}</h2>
-          <button class="nav-btn" @click="nextMonth" @keydown.enter="nextMonth" @keydown.space="nextMonth" aria-label="Next month">›</button>
+        <div v-if="viewMode === 'dates'" class="calendar-section">
+          <FullCalendar :options="calendarOptions" />
         </div>
-        <div class="calendar-grid">
-          <div class="weekday" v-for="day in weekdays" :key="day">{{ day }}</div>
-          <div 
-            v-for="date in calendarDates" 
-            :key="date.key"
-            :class="['calendar-day', { 
-              'other-month': !date.currentMonth,
-              'today': date.isToday,
-              'has-event': date.hasEvent,
-              'selected': selectedDate === date.key
-            }]"
-            @click="selectDate(date)"
-            @keydown.enter="selectDate(date)"
-            @keydown.space="selectDate(date)"
-            :tabindex="date.currentMonth ? '0' : '-1'"
-            :aria-label="`${date.day} ${date.currentMonth ? '' : '(outside current month)'}`"
-            :aria-selected="selectedDate === date.key"
-            role="button"
-          >
-            {{ date.day }}
-            <div v-if="date.hasEvent" class="event-indicator" aria-label="Has event">●</div>
+        <div v-else class="booking-section-fullwidth">
+          <h3>Available Time Slots</h3>
+          <div class="selected-date">
+            Date: {{ formatDate(selectedDate) }}
           </div>
+          <div class="time-slots">
+            <div 
+              v-for="slot in availableSlots" 
+              :key="slot.time"
+              :class="['time-slot', { 'booked': slot.booked }]"
+              @click="bookSlot(slot)"
+              @keydown.enter="bookSlot(slot)"
+              @keydown.space="bookSlot(slot)"
+              :tabindex="slot.booked ? '-1' : '0'"
+              :aria-label="`${slot.time} - ${slot.booked ? 'Booked' : 'Available'}`"
+              role="button"
+            >
+              <span class="time">{{ slot.time }}</span>
+              <span class="status">{{ slot.booked ? 'Booked' : 'Available' }}</span>
+            </div>
+          </div>
+          <button 
+            :disabled="!selectedSlot" 
+            class="book-btn" 
+            @click="confirmBooking"
+            @keydown.enter="confirmBooking"
+            @keydown.space="confirmBooking"
+            :aria-disabled="!selectedSlot"
+          >
+            Confirm Booking
+          </button>
         </div>
       </div>
-      <div class="booking-section">
-        <h3>Tai Chi Class Booking</h3>
-        <div v-if="selectedDate" class="selected-date">
-          Selected: {{ formatDate(selectedDate) }}
-        </div>
-        <div class="time-slots">
-          <div 
-            v-for="slot in availableSlots" 
-            :key="slot.time"
-            :class="['time-slot', { 'booked': slot.booked }]"
-            @click="bookSlot(slot)"
-            @keydown.enter="bookSlot(slot)"
-            @keydown.space="bookSlot(slot)"
-            :tabindex="slot.booked ? '-1' : '0'"
-            :aria-label="`${slot.time} - ${slot.booked ? 'Booked' : 'Available'}`"
-            role="button"
-          >
-            <span class="time">{{ slot.time }}</span>
-            <span class="status">{{ slot.booked ? 'Booked' : 'Available' }}</span>
-          </div>
-        </div>
-        <button 
-          v-if="selectedSlot" 
-          class="book-btn" 
-          @click="confirmBooking"
-          @keydown.enter="confirmBooking"
-          @keydown.space="confirmBooking"
-        >
-          Confirm Booking
-        </button>
-      </div>
-    </div>
     </div>
   </div>
 </template>
@@ -75,59 +51,82 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import FullCalendar from '@fullcalendar/vue3';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
 
 const router = useRouter();
-const currentDate = ref(new Date());
 const selectedDate = ref(null);
 const selectedSlot = ref(null);
+const currentDate = ref(new Date());
+const viewMode = ref('dates'); // 'dates' or 'slots'
 
-const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+// 生成时间段 - 上午9点到11点，下午2点到4点，每个时间段1小时
+function generateTimeSlots() {
+  return [
+    { time: '09:00 AM - 10:00 AM', booked: false },
+    { time: '10:00 AM - 11:00 AM', booked: false },
+    { time: '02:00 PM - 03:00 PM', booked: false },
+    { time: '03:00 PM - 04:00 PM', booked: false }
+  ];
+}
 
-const currentMonthYear = computed(() => {
-  return currentDate.value.toLocaleDateString('en-US', { 
-    month: 'long', 
-    year: 'numeric' 
-  });
-});
-
-const calendarDates = computed(() => {
-  const year = currentDate.value.getFullYear();
-  const month = currentDate.value.getMonth();
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const startDate = new Date(firstDay);
-  startDate.setDate(startDate.getDate() - firstDay.getDay());
-  
-  const dates = [];
-  const today = new Date();
-  
-  for (let i = 0; i < 42; i++) {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + i);
-    
-    dates.push({
-      key: date.toISOString().split('T')[0],
-      day: date.getDate(),
-      currentMonth: date.getMonth() === month,
-      isToday: date.toDateString() === today.toDateString(),
-      hasEvent: Math.random() > 0.7 // 随机显示有活动的日期
-    });
-  }
-  
-  return dates;
-});
-
-const availableSlots = ref([
-  { time: '09:00 AM', booked: false },
-  { time: '10:30 AM', booked: true },
-  { time: '02:00 PM', booked: false },
-  { time: '03:30 PM', booked: false },
-  { time: '05:00 PM', booked: true },
-  { time: '06:30 PM', booked: false }
+// 模拟时间段数据
+const eventsData = ref([
+  { id: 1, date: '2023-06-15', timeSlots: generateTimeSlots() },
+  { id: 2, date: '2023-06-16', timeSlots: generateTimeSlots() },
+  { id: 3, date: '2023-06-20', timeSlots: generateTimeSlots() },
+  { id: 4, date: '2023-06-21', timeSlots: generateTimeSlots() },
+  { id: 5, date: '2023-06-25', timeSlots: generateTimeSlots() },
+  { id: 6, date: '2023-06-26', timeSlots: generateTimeSlots() }
 ]);
 
-function goBack() {
-  router.go(-1);
+// Calendar options
+const calendarOptions = ref({
+  plugins: [dayGridPlugin, interactionPlugin],
+  initialView: 'dayGridMonth',
+  headerToolbar: {
+    left: 'prev,next today',
+    center: 'title',
+    right: 'dayGridMonth,dayGridWeek,dayGridDay'
+  },
+  events: [
+    { title: 'Tai Chi Class', date: '2023-06-15', backgroundColor: '#1ab3a6' },
+    { title: 'Health Workshop', date: '2023-06-20', backgroundColor: '#1ab3a6' },
+    { title: 'Senior Social', date: '2023-06-25', backgroundColor: '#1ab3a6' }
+  ],
+  dateClick: handleDateClick,
+  eventClick: handleEventClick
+});
+
+// 删除重复的eventsData声明
+
+// Computed property for available slots based on selected date
+const availableSlots = computed(() => {
+  if (!selectedDate.value) return [];
+  
+  // Find event for selected date
+  const event = eventsData.value.find(e => e.date === selectedDate.value);
+  
+  // If event exists for this date, return its slots
+  // Otherwise, generate default available slots
+  return event ? event.timeSlots : generateTimeSlots();
+});
+
+// Calendar event handlers
+function handleDateClick(info) {
+  selectedDate.value = info.dateStr;
+  selectedSlot.value = null;
+  viewMode.value = 'slots'; // 选择日期后切换到时间段视图
+}
+
+function goToDateSelection() {
+  viewMode.value = 'dates';
+}
+
+function handleEventClick(info) {
+  selectedDate.value = info.event.startStr.split('T')[0];
+  selectedSlot.value = null;
 }
 
 function previousMonth() {
@@ -153,9 +152,44 @@ function bookSlot(slot) {
 
 function confirmBooking() {
   if (selectedSlot.value && selectedDate.value) {
-    alert(`Booking confirmed for ${formatDate(selectedDate.value)} at ${selectedSlot.value.time}`);
-    selectedSlot.value.booked = true;
-    selectedSlot.value = null;
+    // 直接调用后端API处理预约
+    fetch('/api/book-appointment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        date: selectedDate.value,
+        time: selectedSlot.value.time,
+        userId: 'user123', // 实际应用中应从认证信息获取
+        userName: '当前用户' // 实际应用中应从认证信息获取
+      })
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json().then(data => ({ success: true, data }));
+      } else {
+        return response.json().then(data => ({ success: false, status: response.status, data }));
+      }
+    })
+    .then(result => {
+      if (result.success) {
+        alert('successfully appointed');
+        selectedSlot.value.booked = true;
+        selectedSlot.value = null;
+      } else {
+        // 检查是否是预约冲突错误
+        if (result.status === 409) {
+          alert('failed appointed');
+        } else {
+          alert('failed appointed');
+        }
+      }
+    })
+    .catch(error => {
+      console.error('预约错误:', error);
+      alert('failed appointed');
+    });
   }
 }
 
@@ -168,6 +202,12 @@ function formatDate(dateString) {
     day: 'numeric' 
   });
 }
+
+function goBack() {
+  router.go(-1);
+}
+
+
 </script>
 
 <style scoped>
@@ -230,11 +270,41 @@ function formatDate(dateString) {
   width: 100%;
 }
 
+.booking-section-fullwidth {
+  grid-column: 1 / -1; /* 跨越所有列 */
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
 .calendar-section {
   background: #fff;
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* FullCalendar button styling */
+.calendar-section .fc-button {
+  background-color: #1ab3a6 !important;
+  border-color: #1ab3a6 !important;
+  color: white !important;
+}
+
+.calendar-section .fc-button:hover {
+  background-color: #6ed6c5 !important;
+  border-color: #6ed6c5 !important;
+}
+
+.calendar-section .fc-button:active,
+.calendar-section .fc-button:focus {
+  box-shadow: 0 0 0 0.2rem rgba(26, 179, 166, 0.25) !important;
+}
+
+.calendar-section .fc-button-primary:not(:disabled).fc-button-active {
+  background-color: #6ed6c5 !important;
+  border-color: #6ed6c5 !important;
 }
 
 .calendar-header {
@@ -245,10 +315,10 @@ function formatDate(dateString) {
 }
 
 .nav-btn {
-  background: none;
+  background: #1ab3a6;
   border: none;
   font-size: 1.5rem;
-  color: #1ab3a6;
+  color: white;
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
@@ -256,7 +326,7 @@ function formatDate(dateString) {
 }
 
 .nav-btn:hover {
-  background: #e0f7f4;
+  background: #6ed6c5;
 }
 
 .calendar-header h2 {
@@ -369,14 +439,17 @@ function formatDate(dateString) {
 }
 
 .time-slot.booked {
-  background: #f5f5f5;
-  color: #999;
+  background: #1ab3a6;
+  color: #ffffff;
   cursor: not-allowed;
+  opacity: 0.7;
 }
 
-.time-slot.booked:hover {
-  border-color: #e0e0e0;
-  background: #f5f5f5;
+.time-slot.booked {
+  background: #1ab3a6;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .time {
@@ -400,6 +473,13 @@ function formatDate(dateString) {
   font-weight: bold;
   cursor: pointer;
   transition: background 0.2s;
+}
+
+.book-btn:disabled {
+  background: #b2dbd7;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .book-btn:hover {

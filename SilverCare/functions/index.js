@@ -69,20 +69,58 @@ exports.sendEmail = functions.https.onCall(async (data, context) => {
   }
 });
 
+// 处理预约的云函数
+exports.bookAppointment = functions.https.onCall(async (data, context) => {
+  // 验证用户是否已认证
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', '用户未认证');
+  }
+
+  const { date, time, userId, userName } = data;
+
+  // 验证必要参数
+  if (!date || !time || !userId) {
+    throw new functions.https.HttpsError('invalid-argument', '缺少必要的预约参数');
+  }
+
+  try {
+    // 引用appointments集合
+    const appointmentsRef = admin.firestore().collection('appointments');
+    
+    // 查询是否已存在相同时间的预约
+    const existingAppointment = await appointmentsRef
+      .where('date', '==', date)
+      .where('time', '==', time)
+      .get();
+    
+    // 如果已存在预约，返回错误
+    if (!existingAppointment.empty) {
+      throw new functions.https.HttpsError('already-exists', '该时间段已被预约');
+    }
+    
+    // 保存预约信息
+    const newAppointment = {
+      date: date,
+      time: time,
+      userId: userId,
+      userName: userName || '未知用户',
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    };
+    
+    await appointmentsRef.add(newAppointment);
+    
+    return {
+      success: true,
+      message: '预约成功'
+    };
+  } catch (error) {
+    console.error('预约处理失败:', error);
+    if (error.code === 'already-exists') {
+      throw error;
+    }
+    throw new functions.https.HttpsError('internal', '预约处理失败', error);
+  }
+});
+
 // 可以在这里添加更多云函数
 // 例如：处理用户注册、数据同步等
-
-// 示例：用户注册时发送欢迎邮件
-// exports.sendWelcomeEmail = functions.auth.user().onCreate(async (user) => {
-//   const email = user.email;
-//   const displayName = user.displayName || '用户';
-//   
-//   const mailOptions = {
-//     from: 'YOUR_EMAIL_ADDRESS',
-//     to: email,
-//     subject: '欢迎加入SilverCare',
-//     text: `亲爱的${displayName}，\n\n欢迎加入SilverCare！我们很高兴您成为我们社区的一员。\n\n祝您使用愉快！\nSilverCare团队`
-//   };
-//   
-//   return transporter.sendMail(mailOptions);
-// });

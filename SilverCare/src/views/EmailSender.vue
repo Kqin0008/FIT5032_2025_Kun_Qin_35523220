@@ -2,10 +2,23 @@
   <div class="email-sender">
     <h1>Send Email</h1>
     <div class="form-container">
+      <!-- Toggle for bulk email mode -->
       <div class="form-group">
+        <label>
+          <input type="checkbox" v-model="isBulkEmail" /> Send Bulk Email
+        </label>
+      </div>
+      
+      <div class="form-group" v-if="!isBulkEmail">
         <label for="to">To:</label>
         <InputText id="to" v-model="to" placeholder="Recipient's email address" class="w-full" aria-describedby="to-error" />
         <span v-if="errors.to" id="to-error" class="error" role="alert">{{ errors.to }}</span>
+      </div>
+      
+      <div class="form-group" v-else>
+        <label for="recipients">Recipients (comma separated):</label>
+        <textarea id="recipients" v-model="recipients" placeholder="Enter email addresses separated by commas" class="w-full" rows="3" aria-describedby="recipients-error"></textarea>
+        <span v-if="errors.recipients" id="recipients-error" class="error" role="alert">{{ errors.recipients }}</span>
       </div>
 
       <div class="form-group">
@@ -37,13 +50,14 @@
 
 <script setup>
 import { ref } from 'vue';
-import { sendEmail, uploadAttachment } from '../services/emailService.js';
+import { sendEmail, sendBulkEmail, uploadAttachment } from '../services/emailService.js';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
 // Form fields
 const to = ref('');
+const recipients = ref('');
 const subject = ref('');
 const body = ref('');
 const selectedFile = ref(null);
@@ -51,6 +65,7 @@ const sending = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
 const errors = ref({});
+const isBulkEmail = ref(false);
 
 // Handle file selection
 function handleFileChange(event) {
@@ -71,12 +86,29 @@ function validateForm() {
   let isValid = true;
   errors.value = {};
 
-  if (!to.value.trim()) {
-    errors.value.to = 'Recipient email is required';
-    isValid = false;
-  } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to.value)) {
-    errors.value.to = 'Please enter a valid email address';
-    isValid = false;
+  if (!isBulkEmail.value) {
+    // Single email validation
+    if (!to.value.trim()) {
+      errors.value.to = 'Recipient email is required';
+      isValid = false;
+    } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to.value)) {
+      errors.value.to = 'Please enter a valid email address';
+      isValid = false;
+    }
+  } else {
+    // Bulk email validation
+    if (!recipients.value.trim()) {
+      errors.value.recipients = 'At least one recipient is required';
+      isValid = false;
+    } else {
+      // Validate each email address
+      const emails = recipients.value.split(',').map(email => email.trim()).filter(email => email);
+      const invalidEmails = emails.filter(email => !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email));
+      if (invalidEmails.length > 0) {
+        errors.value.recipients = `Invalid email addresses: ${invalidEmails.join(', ')}`;
+        isValid = false;
+      }
+    }
   }
 
   if (!subject.value.trim()) {
@@ -106,42 +138,67 @@ async function handleSendEmail() {
   sending.value = true;
 
   try {
-    // Prepare attachments array
-    let attachments = [];
+    if (!isBulkEmail.value) {
+      // Send single email
+      // Prepare attachments array
+      let attachments = [];
 
-    // Process attachment if selected
-    if (selectedFile.value) {
-      const uploadResult = await uploadAttachment(selectedFile.value);
-      if (!uploadResult.success) {
-        throw new Error(uploadResult.message || 'Failed to process attachment');
+      // Process attachment if selected
+      if (selectedFile.value) {
+        const uploadResult = await uploadAttachment(selectedFile.value);
+        if (!uploadResult.success) {
+          throw new Error(uploadResult.message || 'Failed to process attachment');
+        }
+
+        attachments.push({
+          base64: uploadResult.base64,
+          filename: uploadResult.fileName,
+          type: uploadResult.fileType,
+          disposition: 'attachment'
+        });
+        console.log('Prepared attachment:', attachments[0]);
       }
 
-      attachments.push({
-        base64: uploadResult.base64,
-        filename: uploadResult.fileName,
-        type: uploadResult.fileType,
-        disposition: 'attachment'
+      // Send email with object parameters
+      const result = await sendEmail({
+        to: to.value,
+        subject: subject.value,
+        text: body.value,
+        attachments: attachments
       });
-      console.log('Prepared attachment:', attachments[0]);
-    }
 
-    // Send email with object parameters
-    const result = await sendEmail({
-      to: to.value,
-      subject: subject.value,
-      text: body.value,
-      attachments: attachments
-    });
-
-    if (result.success) {
-      successMessage.value = 'Email sent successfully!';
-      // Reset form
-      to.value = '';
-      subject.value = '';
-      body.value = '';
-      removeAttachment();
+      if (result.success) {
+        successMessage.value = 'Email sent successfully!';
+        // Reset form
+        to.value = '';
+        subject.value = '';
+        body.value = '';
+        removeAttachment();
+      } else {
+        errorMessage.value = result.message || 'Failed to send email';
+      }
     } else {
-      errorMessage.value = result.message || 'Failed to send email';
+      // Send bulk email
+      const emails = recipients.value.split(',').map(email => email.trim()).filter(email => email);
+      
+      // Send bulk email with attachment
+      const result = await sendBulkEmail(
+        emails,
+        subject.value,
+        body.value,
+        selectedFile.value
+      );
+
+      if (result.success) {
+        successMessage.value = `Bulk email sent successfully to ${emails.length} recipients!`;
+        // Reset form
+        recipients.value = '';
+        subject.value = '';
+        body.value = '';
+        removeAttachment();
+      } else {
+        errorMessage.value = result.message || 'Failed to send bulk email';
+      }
     }
   } catch (error) {
     errorMessage.value = error.message || 'An error occurred while sending email';
