@@ -54,7 +54,8 @@ initializeAuth();
 
 // Import accessibility plugin
 import { setupAccessibility } from './plugins/accessibility.js';
-
+console.log("VITE_AMAP_API_KEY:", import.meta.env.VITE_AMAP_API_KEY);
+console.log("VITE_AMAP_SECURITY_CODE:", import.meta.env.VITE_AMAP_SECURITY_CODE);
 // Mount the app
 app.mount('#app');
 
